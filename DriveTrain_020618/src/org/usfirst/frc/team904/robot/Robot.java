@@ -7,6 +7,7 @@
 
 package org.usfirst.frc.team904.robot;
 
+import com.ctre.phoenix.motorcontrol.NeutralMode;
 import com.ctre.phoenix.motorcontrol.can.WPI_TalonSRX;
 
 import edu.wpi.first.wpilibj.DoubleSolenoid;
@@ -28,12 +29,8 @@ public class Robot extends IterativeRobot {
 	private String m_autoSelected;
 	private SendableChooser<String> m_chooser = new SendableChooser<>();
 
-	private WPI_TalonSRX leftMotor1 = new WPI_TalonSRX(2);
-	private WPI_TalonSRX leftMotor2 = new WPI_TalonSRX(3);
-	private WPI_TalonSRX leftMotor3 = new WPI_TalonSRX(4);
-	private WPI_TalonSRX rightMotor1 = new WPI_TalonSRX(5);
-	private WPI_TalonSRX rightMotor2 = new WPI_TalonSRX(6);
-	private WPI_TalonSRX rightMotor3 = new WPI_TalonSRX(7);
+	private WPI_TalonSRX[] leftMotors = {new WPI_TalonSRX(2), new WPI_TalonSRX(3), new WPI_TalonSRX(4)};
+	private WPI_TalonSRX[] rightMotors = {new WPI_TalonSRX(5), new WPI_TalonSRX(6), new WPI_TalonSRX(7)};
 	
 	private Joystick stick = new Joystick(0);
 	private DoubleSolenoid shift = new DoubleSolenoid(0, 1);
@@ -59,6 +56,15 @@ public class Robot extends IterativeRobot {
 		m_chooser.addDefault("Default Auto", kDefaultAuto);
 		m_chooser.addObject("My Auto", kCustomAuto);
 		SmartDashboard.putData("Auto choices", m_chooser);
+		
+		for(WPI_TalonSRX motor : leftMotors)
+		{
+			motor.setNeutralMode(NeutralMode.Coast);
+		}
+		for(WPI_TalonSRX motor : rightMotors)
+		{
+			motor.setNeutralMode(NeutralMode.Coast);
+		}
 		
 		shift.set(DoubleSolenoid.Value.kReverse);
 	}
@@ -157,12 +163,14 @@ public class Robot extends IterativeRobot {
 		motorLeft = -motorLeft / scaleFactor;
 		motorRight = -motorRight / scaleFactor;
 	
-		leftMotor1.set(motorLeft);
-		leftMotor2.set(motorLeft);
-		leftMotor3.set(motorLeft);
-		rightMotor1.set(motorRight);
-		rightMotor2.set(motorRight);
-		rightMotor3.set(motorRight);
+		for(WPI_TalonSRX motor : leftMotors)
+		{
+			motor.set(motorLeft);
+		}
+		for(WPI_TalonSRX motor : rightMotors)
+		{
+			motor.set(motorRight);
+		}
 		
 		boolean triggerHighGear = stick.getTrigger();
 		boolean buttonLowGear = stick.getTop();
