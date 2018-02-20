@@ -7,10 +7,12 @@
 
 package org.usfirst.frc.team904.robot;
 
+import com.ctre.phoenix.motorcontrol.FeedbackDevice;
 import com.ctre.phoenix.motorcontrol.NeutralMode;
 import com.ctre.phoenix.motorcontrol.can.WPI_TalonSRX;
 
 import edu.wpi.first.wpilibj.DoubleSolenoid;
+import edu.wpi.first.wpilibj.GenericHID.Hand;
 import edu.wpi.first.wpilibj.IterativeRobot;
 import edu.wpi.first.wpilibj.Joystick;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
@@ -29,23 +31,6 @@ public class Robot extends IterativeRobot {
 	private String m_autoSelected;
 	private SendableChooser<String> m_chooser = new SendableChooser<>();
 
-	private WPI_TalonSRX[] leftMotors = {new WPI_TalonSRX(2), new WPI_TalonSRX(3), new WPI_TalonSRX(4)};
-	private WPI_TalonSRX[] rightMotors = {new WPI_TalonSRX(5), new WPI_TalonSRX(6), new WPI_TalonSRX(7)};
-	
-	private Joystick stick = new Joystick(0);
-	private DoubleSolenoid shift = new DoubleSolenoid(0, 1);
-	
-	private double xValueLeft;
-	private double xValueRight;
-	private double yValueLeft;
-	private double yValueRight;
-	private double motorLeft;
-	private double motorRight;
-	private double scaleFactor;
-	
-	private double yJoy;
-	private double xJoy;
-	private double zJoy;
 
 	/**
 	 * This function is run when the robot is first started up and should be
@@ -57,16 +42,27 @@ public class Robot extends IterativeRobot {
 		m_chooser.addObject("My Auto", kCustomAuto);
 		SmartDashboard.putData("Auto choices", m_chooser);
 		
-		for(WPI_TalonSRX motor : leftMotors)
+		for(WPI_TalonSRX motor : RobotMap.leftMotors)
 		{
 			motor.setNeutralMode(NeutralMode.Coast);
+			motor.setInverted(false);
+			motor.set(0);
 		}
-		for(WPI_TalonSRX motor : rightMotors)
+		for(WPI_TalonSRX motor : RobotMap.rightMotors)
 		{
 			motor.setNeutralMode(NeutralMode.Coast);
+			motor.setInverted(true);
+			motor.set(0);
 		}
+
+		RobotMap.climber.setNeutralMode(NeutralMode.Brake);
+		RobotMap.climber.set(0);
+
+		RobotMap.arms.setNeutralMode(NeutralMode.Brake);
+		RobotMap.arms.set(0);
 		
-		shift.set(DoubleSolenoid.Value.kReverse);
+		RobotMap.shift.set(RobotMap.shiftLow);
+		RobotMap.grabber.set(RobotMap.grabberClose);
 	}
 
 	/**
@@ -86,6 +82,8 @@ public class Robot extends IterativeRobot {
 		// autoSelected = SmartDashboard.getString("Auto Selector",
 		// defaultAuto);
 		System.out.println("Auto selected: " + m_autoSelected);
+		
+		RobotMap.leftMotors[0].configSelectedFeedbackSensor(FeedbackDevice.CTRE_MagEncoder_Relative, 0, 10);
 	}
 
 	/**
@@ -95,11 +93,13 @@ public class Robot extends IterativeRobot {
 	public void autonomousPeriodic() {
 		switch (m_autoSelected) {
 			case kCustomAuto:
-				// Put custom auto code here
+				drive(0,1);
+				while(Math.abs(RobotMap.leftMotors[0].getSelectedSensorPosition(0)) > RobotMap.baseline);
+				drive(0,0);
 				break;
 			case kDefaultAuto:
 			default:
-				// Put default auto code here
+				// Do Nothing
 				break;
 		}
 	}
@@ -109,29 +109,47 @@ public class Robot extends IterativeRobot {
 	 */
 	@Override
 	public void teleopPeriodic() {
-		yJoy = stick.getY();
-		xJoy = 0;	//stick.getX();
-		zJoy = stick.getZ();
-		double xVal, yVal;
 		
-		if(Math.abs(zJoy) > Math.abs(xJoy))
-			xJoy = zJoy;
+		// Drivetrain
+		///////////////////
+		double[] xy = deadzone(
+				RobotMap.driveStick.getRawAxis(RobotMap.driveStickTurnAxis),
+				RobotMap.driveStick.getRawAxis(RobotMap.driveStickForwardAxis));
+		drive(xy[0], xy[1]);
 		
-		if(xJoy > 0.20)
-			xVal = (xJoy - 0.20) * 1.25;
-		else if(xJoy < -0.20)
-			xVal = (xJoy + 0.20) * 1.25;
+		// Accessory motors
+		/////////////////////
+		RobotMap.arms.set(deadzone(RobotMap.accessoryStick.getRawAxis(RobotMap.accessoryStickArmsAxis)));
+		RobotMap.climber.set(deadzone(RobotMap.accessoryStick.getRawAxis(RobotMap.accessoryStickClimbAxis)));
+		
+		// Grabber
+		////////////////////
+		if(RobotMap.accessoryStick.getRawAxis(RobotMap.accessoryStickGrabberGrabTrigger) > 0.5)
+		{
+			RobotMap.grabber.set(RobotMap.grabberClose);
+		}
+		else if(RobotMap.accessoryStick.getRawAxis(RobotMap.accessoryStickGrabberReleaseTrigger) > 0.5)
+		{
+			RobotMap.grabber.set(RobotMap.grabberOpen);
+		}
 		else
-			xVal = 0;
+		{
+			RobotMap.grabber.set(DoubleSolenoid.Value.kOff);
+		}
 		
-		if(yJoy > 0.20)
-			yVal = (yJoy - 0.20) * 1.25;
-		else if(yJoy < -0.20)
-			yVal = (yJoy + 0.20) * 1.25;
-		else
-			yVal = 0;
 		
-		drive(yVal, xVal);
+		// Gear shifting
+		/////////////////////
+		boolean triggerHighGear = RobotMap.driveStick.getTrigger();
+		boolean buttonLowGear = RobotMap.driveStick.getTop();
+		
+		if (triggerHighGear) {
+			RobotMap.shift.set(RobotMap.shiftHigh);
+		} else if (buttonLowGear) {
+			RobotMap.shift.set(RobotMap.shiftLow);
+		} else {
+			RobotMap.shift.set(DoubleSolenoid.Value.kOff);
+		}
 	}
 
 	/**
@@ -141,46 +159,44 @@ public class Robot extends IterativeRobot {
 	public void testPeriodic() {
 	}
 
-	public void drive(double xValue, double yValue) {
-		xValueLeft = xValue;
-		xValueRight = -xValue;
-		yValueLeft = -yValue;
-		yValueRight = -yValue;
-		motorLeft = (yValueLeft + xValueLeft);
-		motorRight = (yValueRight + xValueRight);
+	
+	public double deadzone(double x) {
+		if(x > 0.20)
+			x = (x - 0.20) * 1.25;
+		else if(x < -0.20)
+			x = (x + 0.20) * 1.25;
+		else
+			x = 0;
+		
+		return x;
+	}
+	
+	public double[] deadzone(double x, double y) {	
+		return new double[] {deadzone(x), deadzone(y)};
+	}
+	
+	public void drive(double turn, double forward) {
+		double motorLeft = (forward + turn);
+		double motorRight = (forward - turn);
+		
+		double scaleFactor;
+		
 		if ((Math.max(Math.abs(motorLeft), Math.abs(motorRight)) > 1)) {
 			scaleFactor = Math.max(Math.abs(motorLeft), Math.abs(motorRight));
 		} else {
 			scaleFactor = 1;
 		}
-		if (yValueLeft < 0) {
-			if (Math.abs(zJoy) < Math.abs(xJoy)) {
-				double temp = motorLeft;
-				motorLeft = motorRight;
-				motorRight = temp;
-			}
-		}
-		motorLeft = -motorLeft / scaleFactor;
-		motorRight = -motorRight / scaleFactor;
+		
+		motorLeft = motorLeft / scaleFactor;
+		motorRight = motorRight / scaleFactor;
 	
-		for(WPI_TalonSRX motor : leftMotors)
+		for(WPI_TalonSRX motor : RobotMap.leftMotors)
 		{
 			motor.set(motorLeft);
 		}
-		for(WPI_TalonSRX motor : rightMotors)
+		for(WPI_TalonSRX motor : RobotMap.rightMotors)
 		{
 			motor.set(motorRight);
-		}
-		
-		boolean triggerHighGear = stick.getTrigger();
-		boolean buttonLowGear = stick.getTop();
-		
-		if (triggerHighGear) {
-			shift.set(DoubleSolenoid.Value.kForward);
-		} else if (buttonLowGear) {
-			shift.set(DoubleSolenoid.Value.kReverse);
-		} else {
-			shift.set(DoubleSolenoid.Value.kOff);
 		}
 	}
 }
