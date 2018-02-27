@@ -11,6 +11,11 @@ import com.ctre.phoenix.motorcontrol.FeedbackDevice;
 import com.ctre.phoenix.motorcontrol.NeutralMode;
 import com.ctre.phoenix.motorcontrol.can.WPI_TalonSRX;
 
+import org.opencv.core.Mat;
+import org.opencv.imgproc.Imgproc;
+
+import edu.wpi.cscore.CvSink;
+import edu.wpi.first.wpilibj.CameraServer;
 import edu.wpi.first.wpilibj.DoubleSolenoid;
 import edu.wpi.first.wpilibj.GenericHID.Hand;
 import edu.wpi.first.wpilibj.IterativeRobot;
@@ -63,6 +68,15 @@ public class Robot extends IterativeRobot {
 		
 		RobotMap.shift.set(RobotMap.shiftLow);
 		RobotMap.grabber.set(RobotMap.grabberClose);
+		
+		RobotMap.camera  = CameraServer.getInstance().startAutomaticCapture();
+		RobotMap.camera.setResolution(640, 480);
+		
+		RobotMap.cvSink = CameraServer.getInstance().getVideo();
+		RobotMap.outputStream = CameraServer.getInstance().putVideo("Blur", 640, 480);
+		
+		RobotMap.cvSink.grabFrame(RobotMap.source);
+		RobotMap.cvSink.grabFrame(RobotMap.source);
 	}
 
 	/**
@@ -97,6 +111,9 @@ public class Robot extends IterativeRobot {
 				while(Math.abs(RobotMap.leftMotors[0].getSelectedSensorPosition(0)) > RobotMap.baseline);
 				drive(0,0);
 				break;
+			/*case kVisionAuto:
+				//stuff
+				break;*/
 			case kDefaultAuto:
 			default:
 				// Do Nothing

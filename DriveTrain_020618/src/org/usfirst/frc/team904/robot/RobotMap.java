@@ -1,7 +1,14 @@
 package org.usfirst.frc.team904.robot;
 
+import org.opencv.core.Mat;
+
 import com.ctre.phoenix.motorcontrol.can.WPI_TalonSRX;
 
+import edu.wpi.cscore.CvSink;
+import edu.wpi.cscore.CvSource;
+import edu.wpi.cscore.UsbCamera;
+
+import edu.wpi.first.wpilibj.CameraServer;
 import edu.wpi.first.wpilibj.DoubleSolenoid;
 import edu.wpi.first.wpilibj.Joystick;
 
@@ -46,8 +53,14 @@ public class RobotMap {
 
 	// encoder values to disable high gear to resist tipping the robot
 	public static final double elevation = 0.0; // climber elevation
-	public static final double extend = 0.0; // arm extention
+	public static final double extend = 0.0; // arm extension
 	
 	// encoder values for auton
 	public static final int baseline = 21200;
+	
+	// visual processing
+	public static Mat source = new Mat();
+	public static UsbCamera camera;
+	public static CvSink cvSink;
+	public static CvSource outputStream;
 }
