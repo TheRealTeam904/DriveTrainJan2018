@@ -167,6 +167,11 @@ public class Robot extends IterativeRobot {
 		} else {
 			RobotMap.shift.set(DoubleSolenoid.Value.kOff);
 		}
+		
+		
+		// Camera Streaming
+		/////////////////////
+		streamCameraFeed();
 	}
 
 	/**
@@ -176,7 +181,24 @@ public class Robot extends IterativeRobot {
 	public void testPeriodic() {
 	}
 
+	/**
+	 * Autonomous methods
+	 */
+	public boolean isRed() {
+		return false;
+	}
 	
+	public boolean isBlue() {
+		return false;
+	}
+	
+	public void streamCameraFeed() {
+		// stuff
+	}
+	
+	/**
+	 * Drive methods
+	 */
 	public double deadzone(double x) {
 		if(x > 0.20)
 			x = (x - 0.20) * 1.25;
