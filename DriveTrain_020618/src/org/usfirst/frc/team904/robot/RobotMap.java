@@ -57,6 +57,8 @@ public class RobotMap {
 	
 	// encoder values for auton
 	public static final int baseline = 21200;
+	public static final int redVal = 0xFFF000;
+	public static final int blueVal = 0x000FFF;
 	
 	// visual processing
 	public static Mat source = new Mat();

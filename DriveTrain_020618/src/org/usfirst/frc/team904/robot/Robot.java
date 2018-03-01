@@ -33,6 +33,8 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 public class Robot extends IterativeRobot {
 	private static final String kDefaultAuto = "Default";
 	private static final String kCustomAuto = "My Auto";
+	private static final String kVisionAutoRed = "red";
+	private static final String kVisionAutoBlue = "blue";
 	private String m_autoSelected;
 	private SendableChooser<String> m_chooser = new SendableChooser<>();
 
@@ -76,7 +78,7 @@ public class Robot extends IterativeRobot {
 		RobotMap.outputStream = CameraServer.getInstance().putVideo("Blur", 640, 480);
 		
 		RobotMap.cvSink.grabFrame(RobotMap.source);
-		RobotMap.cvSink.grabFrame(RobotMap.source);
+		
 	}
 
 	/**
@@ -107,13 +109,22 @@ public class Robot extends IterativeRobot {
 	public void autonomousPeriodic() {
 		switch (m_autoSelected) {
 			case kCustomAuto:
-				drive(0,1);
-				while(Math.abs(RobotMap.leftMotors[0].getSelectedSensorPosition(0)) > RobotMap.baseline);
-				drive(0,0);
+				baseline();
 				break;
-			/*case kVisionAuto:
-				//stuff
-				break;*/
+			case kVisionAutoRed:
+				if(isRed()) {
+					//place cube on switch
+				} else {
+					//go and check scale
+				}
+				break;
+			case kVisionAutoBlue:
+				if(isBlue()) {
+					//place cube on switch
+				} else {
+					//go and check scale
+				}
+				break;
 			case kDefaultAuto:
 			default:
 				// Do Nothing
@@ -184,11 +195,44 @@ public class Robot extends IterativeRobot {
 	/**
 	 * Autonomous methods
 	 */
+	public void baseline() {
+		drive(0, 1);
+		while(Math.abs(RobotMap.leftMotors[0].getSelectedSensorPosition(0))
+				> RobotMap.baseline);
+		drive(0, 0);
+	}
+	
+	public int pixVal() {
+		int color = 0;
+		double[] temp = new double[5];
+		
+		RobotMap.cvSink.grabFrame(RobotMap.source);
+		for(int j = 0; j < RobotMap.source.cols(); j++) {
+			for(int i = 0; i < RobotMap.source.rows(); i++) {
+				color += RobotMap.source.get(i, j, temp);
+			}
+		}
+		
+		return color;
+	}
+	
 	public boolean isRed() {
+		int color =  pixVal();
+		
+		if(color > RobotMap.redVal) {
+			return true;
+		}
+		
 		return false;
 	}
 	
 	public boolean isBlue() {
+		int color = pixVal();
+		
+		if(color < RobotMap.blueVal) {
+			return true;
+		}
+		
 		return false;
 	}
 	
