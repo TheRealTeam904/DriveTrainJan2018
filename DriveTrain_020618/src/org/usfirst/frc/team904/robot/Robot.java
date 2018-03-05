@@ -204,7 +204,8 @@ public class Robot extends IterativeRobot {
 	
 	public int pixVal() {
 		int color = 0;
-		double[] temp = new double[5];
+		int num = RobotMap.source.cols() * RobotMap.source.rows();
+		double[] temp = new double[num];	// TODO: is this correct??
 		
 		RobotMap.cvSink.grabFrame(RobotMap.source);
 		for(int j = 0; j < RobotMap.source.cols(); j++) {
@@ -219,7 +220,7 @@ public class Robot extends IterativeRobot {
 	public boolean isRed() {
 		int color =  pixVal();
 		
-		if(color > RobotMap.redVal) {
+		if(color < RobotMap.redVal) {
 			return true;
 		}
 		
@@ -229,7 +230,7 @@ public class Robot extends IterativeRobot {
 	public boolean isBlue() {
 		int color = pixVal();
 		
-		if(color < RobotMap.blueVal) {
+		if(color > RobotMap.blueVal) {
 			return true;
 		}
 		
