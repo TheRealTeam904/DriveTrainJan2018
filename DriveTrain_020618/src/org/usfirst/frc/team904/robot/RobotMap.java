@@ -11,6 +11,7 @@ import edu.wpi.cscore.UsbCamera;
 import edu.wpi.first.wpilibj.CameraServer;
 import edu.wpi.first.wpilibj.DoubleSolenoid;
 import edu.wpi.first.wpilibj.Joystick;
+import edu.wpi.first.wpilibj.XboxController;
 
 /**
  * TODO: On a press of a button make set of value's true to prepare for climbing.
@@ -41,15 +42,14 @@ public class RobotMap {
 	public static int driveStickForwardAxis = driveStick.getYChannel();
 	public static int driveStickTurnAxis = driveStick.getZChannel();
 	
-	
-	public static Joystick accessoryStick = new Joystick(1);
+	public static XboxController controller = new XboxController(1);
 	
 	// channels for controls on the accessory controller,
 	// shown as axes on the driver station when looking at USB devices
 	public static int accessoryStickArmsAxis = 5;
 	public static int accessoryStickClimbAxis = 1;
-	public static int accessoryStickGrabberGrabTrigger = 3;
-	public static int accessoryStickGrabberReleaseTrigger = 2;
+	public static int accessoryStickGrabberGrabTrigger = 2;
+	public static int accessoryStickGrabberReleaseTrigger = 3;
 
 	// encoder values to disable high gear to resist tipping the robot
 	public static final double elevation = 0.0; // climber elevation

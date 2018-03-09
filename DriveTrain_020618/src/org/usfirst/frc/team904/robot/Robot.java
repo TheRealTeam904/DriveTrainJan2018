@@ -33,8 +33,8 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 public class Robot extends IterativeRobot {
 	private static final String kDefaultAuto = "Default";
 	private static final String kCustomAuto = "My Auto";
-	private static final String kVisionAutoRed = "red";
-	private static final String kVisionAutoBlue = "blue";
+	private static final String kVisionAutoRed = "Red";
+	private static final String kVisionAutoBlue = "Blue";
 	private String m_autoSelected;
 	private SendableChooser<String> m_chooser = new SendableChooser<>();
 
@@ -47,6 +47,8 @@ public class Robot extends IterativeRobot {
 	public void robotInit() {
 		m_chooser.addDefault("Default Auto", kDefaultAuto);
 		m_chooser.addObject("My Auto", kCustomAuto);
+		//m_chooser.addObject("Red", kVisionAutoRed);
+		//m_chooser.addObject("Blue", kVisionAutoBlue);
 		SmartDashboard.putData("Auto choices", m_chooser);
 		
 		for(WPI_TalonSRX motor : RobotMap.leftMotors)
@@ -77,8 +79,7 @@ public class Robot extends IterativeRobot {
 		RobotMap.cvSink = CameraServer.getInstance().getVideo();
 		RobotMap.outputStream = CameraServer.getInstance().putVideo("Blur", 640, 480);
 		
-		RobotMap.cvSink.grabFrame(RobotMap.source);
-		
+		RobotMap.camera.setExposureAuto();
 	}
 
 	/**
@@ -100,6 +101,8 @@ public class Robot extends IterativeRobot {
 		System.out.println("Auto selected: " + m_autoSelected);
 		
 		RobotMap.leftMotors[0].configSelectedFeedbackSensor(FeedbackDevice.CTRE_MagEncoder_Relative, 0, 10);
+		
+		RobotMap.camera.setExposureManual(50);
 	}
 
 	/**
@@ -112,14 +115,14 @@ public class Robot extends IterativeRobot {
 				baseline();
 				break;
 			case kVisionAutoRed:
-				if(isRed()) {
+				if(pixVal()) {
 					//place cube on switch
 				} else {
 					//go and check scale
 				}
 				break;
 			case kVisionAutoBlue:
-				if(isBlue()) {
+				if(!pixVal()) {
 					//place cube on switch
 				} else {
 					//go and check scale
@@ -147,16 +150,16 @@ public class Robot extends IterativeRobot {
 		
 		// Accessory motors
 		/////////////////////
-		RobotMap.arms.set(deadzone(RobotMap.accessoryStick.getRawAxis(RobotMap.accessoryStickArmsAxis)));
-		RobotMap.climber.set(deadzone(RobotMap.accessoryStick.getRawAxis(RobotMap.accessoryStickClimbAxis)));
+		RobotMap.arms.set(deadzone(RobotMap.controller.getRawAxis(RobotMap.accessoryStickArmsAxis)));
+		RobotMap.climber.set(deadzone(RobotMap.controller.getRawAxis(RobotMap.accessoryStickClimbAxis)));
 		
-		// Grabber
+		// Grabber - right open, left close
 		////////////////////
-		if(RobotMap.accessoryStick.getRawAxis(RobotMap.accessoryStickGrabberGrabTrigger) > 0.5)
+		if(RobotMap.controller.getRawAxis(RobotMap.accessoryStickGrabberGrabTrigger) > 0.5)
 		{
 			RobotMap.grabber.set(RobotMap.grabberClose);
 		}
-		else if(RobotMap.accessoryStick.getRawAxis(RobotMap.accessoryStickGrabberReleaseTrigger) > 0.5)
+		else if(RobotMap.controller.getRawAxis(RobotMap.accessoryStickGrabberReleaseTrigger) > 0.5)
 		{
 			RobotMap.grabber.set(RobotMap.grabberOpen);
 		}
@@ -178,11 +181,6 @@ public class Robot extends IterativeRobot {
 		} else {
 			RobotMap.shift.set(DoubleSolenoid.Value.kOff);
 		}
-		
-		
-		// Camera Streaming
-		/////////////////////
-		streamCameraFeed();
 	}
 
 	/**
@@ -202,43 +200,32 @@ public class Robot extends IterativeRobot {
 		drive(0, 0);
 	}
 	
-	public int pixVal() {
-		int color = 0;
-		int num = RobotMap.source.cols() * RobotMap.source.rows();
-		double[] temp = new double[num];	// TODO: is this correct??
+	public boolean pixVal() {
+		double red = 0;
+		double blue = 0;
 		
-		RobotMap.cvSink.grabFrame(RobotMap.source);
-		for(int j = 0; j < RobotMap.source.cols(); j++) {
-			for(int i = 0; i < RobotMap.source.rows(); i++) {
-				color += RobotMap.source.get(i, j, temp);
+		long status = RobotMap.cvSink.grabFrame(RobotMap.source);
+		if(status == 0) {System.out.println(RobotMap.cvSink.getError());}
+		else {System.out.println("OK");}
+		
+		int rows = RobotMap.source.rows();
+		int cols = RobotMap.source.cols();
+		double[] temp = new double[3];	// TODO: is this correct??
+		
+		for(int i = 0; i < rows; i++) {
+			for(int j = 0; j < cols; j++) {
+				temp = RobotMap.source.get(i, j);
+				blue += temp[0];	// add the pixel values for blue
+				red += temp[2];		// add the pixel values for red
 			}
 		}
 		
-		return color;
-	}
-	
-	public boolean isRed() {
-		int color =  pixVal();
+		System.out.println("here");
 		
-		if(color < RobotMap.redVal) {
+		if(red > blue)
 			return true;
-		}
-		
-		return false;
-	}
-	
-	public boolean isBlue() {
-		int color = pixVal();
-		
-		if(color > RobotMap.blueVal) {
-			return true;
-		}
-		
-		return false;
-	}
-	
-	public void streamCameraFeed() {
-		// stuff
+		else
+			return false;
 	}
 	
 	/**
