@@ -33,8 +33,8 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 public class Robot extends IterativeRobot {
 	private static final String kDefaultAuto = "Default";
 	private static final String kBaselineAuto = "My Auto";
-	private static final String kVisionAutoRed = "Red";
-	private static final String kVisionAutoBlue = "Blue";
+	private static final String kVisionAutoRightRed = "Red";
+	private static final String kVisionAutoRightBlue = "Blue";
 	private String m_autoSelected;
 	private SendableChooser<String> m_chooser = new SendableChooser<>();
 
@@ -47,8 +47,8 @@ public class Robot extends IterativeRobot {
 	public void robotInit() {
 		m_chooser.addDefault("Default Auto", kDefaultAuto);
 		m_chooser.addObject("My Auto", kBaselineAuto);
-		//m_chooser.addObject("Red", kVisionAutoRed);
-		//m_chooser.addObject("Blue", kVisionAutoBlue);
+		m_chooser.addObject("Turn Right Red", kVisionAutoRightRed);
+		m_chooser.addObject("Turn Right Blue", kVisionAutoRightBlue);
 		SmartDashboard.putData("Auto choices", m_chooser);
 		
 		for(WPI_TalonSRX motor : RobotMap.leftMotors)
@@ -113,7 +113,7 @@ public class Robot extends IterativeRobot {
 			case kBaselineAuto:
 				baseline();
 				break;
-			case kVisionAutoRed:
+			case kVisionAutoRightRed:
 				baseline();
 				turn(RobotMap.right);
 				if(pixVal()) {
@@ -130,7 +130,7 @@ public class Robot extends IterativeRobot {
 					}*/
 				}
 				break;
-			case kVisionAutoBlue:
+			case kVisionAutoRightBlue:
 				baseline();
 				turn(RobotMap.right);
 				if(!pixVal()) {
@@ -215,21 +215,21 @@ public class Robot extends IterativeRobot {
 	public void baseline() {
 		drive(0, 1);
 		while(Math.abs(RobotMap.leftMotors[0].getSelectedSensorPosition(0))
-				> RobotMap.baseline);
+				< RobotMap.baseline);
 		drive(0, 0);
 	}
 	
 	public void turn(int dir) {
 		drive(dir, 0);
-		while(Math.abs(RobotMap.leftMotors[0].getSelectedSensorPosition(0)) > RobotMap.turnVal
-				|| Math.abs(RobotMap.rightMotors[0].getSelectedSensorPosition(1)) > RobotMap.turnVal);
+		while(Math.abs(RobotMap.leftMotors[0].getSelectedSensorPosition(0))
+				< RobotMap.turnVal);
 		drive(0, 0);
 	}
 	
 	public void toScale() {
 		drive(0, 1);
 		while(Math.abs(RobotMap.leftMotors[0].getSelectedSensorPosition(0))
-				> RobotMap.scaleDist);
+				< RobotMap.scaleDist);
 		drive(0, 0);
 	}
 	
@@ -252,8 +252,8 @@ public class Robot extends IterativeRobot {
 				red += temp[2];		// add the pixel values for red
 			}
 		}
-		
-		System.out.println("here");
+
+		System.out.println("");
 		
 		if(red > blue)
 			return true;
