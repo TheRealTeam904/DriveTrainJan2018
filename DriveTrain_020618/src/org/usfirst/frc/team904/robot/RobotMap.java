@@ -56,7 +56,11 @@ public class RobotMap {
 	public static final double extend = 0.0; // arm extension
 	
 	// encoder values for auton
+	public static final int left = -1;
+	public static final int right = 1;
 	public static final int baseline = 21200;
+	public static final int turnVal = 1000;
+	public static final int scaleDist = 21200;
 	public static final int blueVal = 0xFF0000;
 	public static final int redVal = 0x0000FF;
 	

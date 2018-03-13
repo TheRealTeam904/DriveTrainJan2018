@@ -32,7 +32,7 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
  */
 public class Robot extends IterativeRobot {
 	private static final String kDefaultAuto = "Default";
-	private static final String kCustomAuto = "My Auto";
+	private static final String kBaselineAuto = "My Auto";
 	private static final String kVisionAutoRed = "Red";
 	private static final String kVisionAutoBlue = "Blue";
 	private String m_autoSelected;
@@ -46,7 +46,7 @@ public class Robot extends IterativeRobot {
 	@Override
 	public void robotInit() {
 		m_chooser.addDefault("Default Auto", kDefaultAuto);
-		m_chooser.addObject("My Auto", kCustomAuto);
+		m_chooser.addObject("My Auto", kBaselineAuto);
 		//m_chooser.addObject("Red", kVisionAutoRed);
 		//m_chooser.addObject("Blue", kVisionAutoBlue);
 		SmartDashboard.putData("Auto choices", m_chooser);
@@ -96,9 +96,8 @@ public class Robot extends IterativeRobot {
 	@Override
 	public void autonomousInit() {
 		m_autoSelected = m_chooser.getSelected();
-		// autoSelected = SmartDashboard.getString("Auto Selector",
-		// defaultAuto);
-		System.out.println("Auto selected: " + m_autoSelected);
+		// m_autoSelected = SmartDashboard.getString("Auto Selector", kDefaultAuto);
+		// System.out.println("Auto selected: " + m_autoSelected);
 		
 		RobotMap.leftMotors[0].configSelectedFeedbackSensor(FeedbackDevice.CTRE_MagEncoder_Relative, 0, 10);
 		
@@ -111,21 +110,41 @@ public class Robot extends IterativeRobot {
 	@Override
 	public void autonomousPeriodic() {
 		switch (m_autoSelected) {
-			case kCustomAuto:
+			case kBaselineAuto:
 				baseline();
 				break;
 			case kVisionAutoRed:
+				baseline();
+				turn(RobotMap.right);
 				if(pixVal()) {
 					//place cube on switch
+					RobotMap.shift.set(RobotMap.shiftHigh);
 				} else {
 					//go and check scale
+					/*turn(RobotMap.left);
+					toScale();
+					turn(RobotMap.right);
+					if(pixVal()) {
+						// place cube on scale
+						RobotMap.shift.set(RobotMap.shiftHigh);
+					}*/
 				}
 				break;
 			case kVisionAutoBlue:
+				baseline();
+				turn(RobotMap.right);
 				if(!pixVal()) {
 					//place cube on switch
+					RobotMap.shift.set(RobotMap.shiftHigh);
 				} else {
 					//go and check scale
+					/*turn(RobotMap.left);
+					toScale();
+					turn(RobotMap.right);
+					if(pixVal()) {
+						// place cube on scale
+						RobotMap.shift.set(RobotMap.shiftHigh);
+					}*/
 				}
 				break;
 			case kDefaultAuto:
@@ -200,6 +219,20 @@ public class Robot extends IterativeRobot {
 		drive(0, 0);
 	}
 	
+	public void turn(int dir) {
+		drive(dir, 0);
+		while(Math.abs(RobotMap.leftMotors[0].getSelectedSensorPosition(0)) > RobotMap.turnVal
+				|| Math.abs(RobotMap.rightMotors[0].getSelectedSensorPosition(1)) > RobotMap.turnVal);
+		drive(0, 0);
+	}
+	
+	public void toScale() {
+		drive(0, 1);
+		while(Math.abs(RobotMap.leftMotors[0].getSelectedSensorPosition(0))
+				> RobotMap.scaleDist);
+		drive(0, 0);
+	}
+	
 	public boolean pixVal() {
 		double red = 0;
 		double blue = 0;
@@ -210,7 +243,7 @@ public class Robot extends IterativeRobot {
 		
 		int rows = RobotMap.source.rows();
 		int cols = RobotMap.source.cols();
-		double[] temp = new double[3];	// TODO: is this correct??
+		double[] temp = new double[3];
 		
 		for(int i = 0; i < rows; i++) {
 			for(int j = 0; j < cols; j++) {
