@@ -24,8 +24,8 @@ public class RobotMap {
 	public static WPI_TalonSRX[] leftMotors = {new WPI_TalonSRX(2), new WPI_TalonSRX(3), new WPI_TalonSRX(4)};
 	public static WPI_TalonSRX[] rightMotors = {new WPI_TalonSRX(5), new WPI_TalonSRX(6), new WPI_TalonSRX(7)};
 
-	public static WPI_TalonSRX arms = new WPI_TalonSRX(8);
-	public static WPI_TalonSRX climber = new WPI_TalonSRX(9);
+	public static WPI_TalonSRX arms = new WPI_TalonSRX(9);
+	public static WPI_TalonSRX climber = new WPI_TalonSRX(8);
 
 	public static DoubleSolenoid shift = new DoubleSolenoid(0, 1);
 	public static DoubleSolenoid.Value shiftLow = DoubleSolenoid.Value.kReverse;
@@ -46,8 +46,8 @@ public class RobotMap {
 	
 	// channels for controls on the accessory controller,
 	// shown as axes on the driver station when looking at USB devices
-	public static int accessoryStickArmsAxis = 5;
-	public static int accessoryStickClimbAxis = 1;
+	public static int accessoryStickArmsAxis = 1;
+	public static int accessoryStickClimbAxis = 5;
 	public static int accessoryStickGrabberGrabTrigger = 2;
 	public static int accessoryStickGrabberReleaseTrigger = 3;
 
