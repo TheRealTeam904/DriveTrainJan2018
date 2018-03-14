@@ -32,8 +32,8 @@ public class RobotMap {
 	public static DoubleSolenoid.Value shiftHigh = DoubleSolenoid.Value.kForward;
 	
 	public static DoubleSolenoid grabber = new DoubleSolenoid(2, 3);
-	public static DoubleSolenoid.Value grabberClose = DoubleSolenoid.Value.kForward;
-	public static DoubleSolenoid.Value grabberOpen = DoubleSolenoid.Value.kReverse;
+	public static DoubleSolenoid.Value grabberClose = DoubleSolenoid.Value.kReverse;
+	public static DoubleSolenoid.Value grabberOpen = DoubleSolenoid.Value.kForward;
 	
 	public static Joystick driveStick = new Joystick(0);
 
@@ -46,10 +46,10 @@ public class RobotMap {
 	
 	// channels for controls on the accessory controller,
 	// shown as axes on the driver station when looking at USB devices
-	public static int accessoryStickArmsAxis = 1;
-	public static int accessoryStickClimbAxis = 5;
-	public static int accessoryStickGrabberGrabTrigger = 2;
-	public static int accessoryStickGrabberReleaseTrigger = 3;
+	public static int accessoryStickArmsAxis = 5;
+	public static int accessoryStickClimbAxis = 1;
+	public static int accessoryStickGrabberGrabTrigger = 3;
+	public static int accessoryStickGrabberReleaseTrigger = 2;
 
 	// encoder values to disable high gear to resist tipping the robot
 	public static final double elevation = 0.0; // climber elevation
