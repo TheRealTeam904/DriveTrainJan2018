@@ -17,6 +17,7 @@ import org.opencv.imgproc.Imgproc;
 import edu.wpi.cscore.CvSink;
 import edu.wpi.first.wpilibj.CameraServer;
 import edu.wpi.first.wpilibj.DoubleSolenoid;
+import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.GenericHID.Hand;
 import edu.wpi.first.wpilibj.IterativeRobot;
 import edu.wpi.first.wpilibj.Joystick;
@@ -37,6 +38,8 @@ public class Robot extends IterativeRobot {
 	private static final String kVisionAutoRightBlue = "Blue";
 	private String m_autoSelected;
 	private SendableChooser<String> m_chooser = new SendableChooser<>();
+	
+	private AutoPlaceCube autoPlaceCube = new AutoPlaceCube();
 
 
 	/**
@@ -80,6 +83,8 @@ public class Robot extends IterativeRobot {
 		RobotMap.outputStream = CameraServer.getInstance().putVideo("Blur", 640, 480);
 		
 		RobotMap.camera.setExposureAuto();
+		
+		autoPlaceCube.onRobotInit();
 	}
 
 	/**
@@ -106,6 +111,8 @@ public class Robot extends IterativeRobot {
 		RobotMap.leftMotors[0].setSelectedSensorPosition(0, 0, 100);
 		
 		RobotMap.hitBaseline = false;
+		
+		autoPlaceCube.onAutonomousInit();
 	}
 
 	/**
@@ -218,6 +225,8 @@ public class Robot extends IterativeRobot {
 	 */
 	public void baseline() {
 		SmartDashboard.putNumber("encoder", RobotMap.leftMotors[0].getSelectedSensorPosition(0));
+		if(RobotMap.hitBaseline)
+			autoPlaceCube.maybePlaceCube();
 		if(!RobotMap.hitBaseline)
 			drive(0, -0.25);
 		if(Math.abs(RobotMap.leftMotors[0].getSelectedSensorPosition(0)) >= RobotMap.baseline) {
