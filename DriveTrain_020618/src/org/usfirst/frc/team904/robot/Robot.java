@@ -17,6 +17,7 @@ import org.opencv.imgproc.Imgproc;
 import edu.wpi.cscore.CvSink;
 import edu.wpi.first.wpilibj.CameraServer;
 import edu.wpi.first.wpilibj.DoubleSolenoid;
+import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.GenericHID.Hand;
 import edu.wpi.first.wpilibj.IterativeRobot;
 import edu.wpi.first.wpilibj.Joystick;
@@ -32,9 +33,9 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
  */
 public class Robot extends IterativeRobot {
 	private static final String kDefaultAuto = "Default";
-	private static final String kBaselineAuto = "My Auto";
-	private static final String kVisionAutoRightRed = "Red";
-	private static final String kVisionAutoRightBlue = "Blue";
+	private static final String kBaselineAuto = "Baseline";
+	private static final String kVisionAutoFarLeftRed = "Red";
+	private static final String kVisionAutoFarLeftBlue = "Blue";
 	private String m_autoSelected;
 	private SendableChooser<String> m_chooser = new SendableChooser<>();
 
@@ -109,43 +110,48 @@ public class Robot extends IterativeRobot {
 	 */
 	@Override
 	public void autonomousPeriodic() {
+		String gameData;
 		switch (m_autoSelected) {
 			case kBaselineAuto:
 				baseline();
 				break;
-			case kVisionAutoRightRed:
+			case kVisionAutoFarLeftRed:
 				baseline();
 				turn(RobotMap.right);
-				if(pixVal()) {
+				gameData = DriverStation.getInstance().getGameSpecificMessage();
+                if(gameData.length() > 0) {
+				  if(gameData.charAt(0) == 'L') {
 					//place cube on switch
-					RobotMap.shift.set(RobotMap.shiftHigh);
-				} else {
-					//go and check scale
-					/*turn(RobotMap.left);
-					toScale();
-					turn(RobotMap.right);
-					if(pixVal()) {
-						// place cube on scale
-						RobotMap.shift.set(RobotMap.shiftHigh);
-					}*/
-				}
+				  } else if(gameData.charAt(1) == 'R') {
+					  //place cube on scale
+					  /*turn(RobotMap.left);
+						toScale();
+						turn(RobotMap.right);
+						if(pixVal()) {
+							// place cube on scale
+							RobotMap.shift.set(RobotMap.shiftHigh);
+						}*/
+				  }
+                }
 				break;
-			case kVisionAutoRightBlue:
+			case kVisionAutoFarLeftBlue:
 				baseline();
 				turn(RobotMap.right);
-				if(!pixVal()) {
+				gameData = DriverStation.getInstance().getGameSpecificMessage();
+                if(gameData.length() > 0) {
+				  if(gameData.charAt(0) == 'L') {
 					//place cube on switch
-					RobotMap.shift.set(RobotMap.shiftHigh);
-				} else {
-					//go and check scale
-					/*turn(RobotMap.left);
-					toScale();
-					turn(RobotMap.right);
-					if(pixVal()) {
-						// place cube on scale
-						RobotMap.shift.set(RobotMap.shiftHigh);
-					}*/
-				}
+				  } else if(gameData.charAt(1) == 'R') {
+					  //place cube on scale
+					  /*turn(RobotMap.left);
+						toScale();
+						turn(RobotMap.right);
+						if(pixVal()) {
+							// place cube on scale
+							RobotMap.shift.set(RobotMap.shiftHigh);
+						}*/
+				  }
+                }
 				break;
 			case kDefaultAuto:
 			default:
