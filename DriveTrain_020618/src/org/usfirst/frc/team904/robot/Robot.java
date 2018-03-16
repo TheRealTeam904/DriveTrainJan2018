@@ -103,6 +103,10 @@ public class Robot extends IterativeRobot {
 		RobotMap.leftMotors[0].configSelectedFeedbackSensor(FeedbackDevice.CTRE_MagEncoder_Relative, 0, 10);
 		
 		RobotMap.camera.setExposureManual(50);
+		
+		RobotMap.leftMotors[0].setSelectedSensorPosition(0, 0, 100);
+		
+		RobotMap.hitBaseline = false;
 	}
 
 	/**
@@ -219,10 +223,13 @@ public class Robot extends IterativeRobot {
 	 * Autonomous methods
 	 */
 	public void baseline() {
-		drive(0, -0.25);
-		while(Math.abs(RobotMap.leftMotors[0].getSelectedSensorPosition(0))
-				< RobotMap.baseline);
-		drive(0, 0);
+		SmartDashboard.putNumber("encoder", RobotMap.leftMotors[0].getSelectedSensorPosition(0));
+		if(!RobotMap.hitBaseline)
+			drive(0, -0.25);
+		if(Math.abs(RobotMap.leftMotors[0].getSelectedSensorPosition(0)) >= RobotMap.baseline) {
+			drive(0, 0);
+			RobotMap.hitBaseline = true;
+		}
 	}
 	
 	public void turn(int dir) {
