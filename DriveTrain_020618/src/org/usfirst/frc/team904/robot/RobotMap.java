@@ -58,7 +58,7 @@ public class RobotMap {
 	// encoder values for auton
 	public static final int left = -1;
 	public static final int right = 1;
-	public static final int baseline = 21200;
+	public static final int baseline = 69000;
 	public static final int turnVal = 1000;
 	public static final int scaleDist = 21200;
 	public static final int blueVal = 0xFF0000;

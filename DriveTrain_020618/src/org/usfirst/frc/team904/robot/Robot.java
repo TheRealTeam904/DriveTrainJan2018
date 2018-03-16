@@ -46,20 +46,20 @@ public class Robot extends IterativeRobot {
 	@Override
 	public void robotInit() {
 		m_chooser.addDefault("Default Auto", kDefaultAuto);
-		m_chooser.addObject("My Auto", kBaselineAuto);
-		m_chooser.addObject("Turn Right Red", kVisionAutoRightRed);
-		m_chooser.addObject("Turn Right Blue", kVisionAutoRightBlue);
+		m_chooser.addObject("Baseline", kBaselineAuto);
+		//m_chooser.addObject("Turn Right Red", kVisionAutoRightRed);
+		//m_chooser.addObject("Turn Right Blue", kVisionAutoRightBlue);
 		SmartDashboard.putData("Auto choices", m_chooser);
 		
 		for(WPI_TalonSRX motor : RobotMap.leftMotors)
 		{
-			motor.setNeutralMode(NeutralMode.Coast);
+			motor.setNeutralMode(NeutralMode.Brake);
 			motor.setInverted(false);
 			motor.set(0);
 		}
 		for(WPI_TalonSRX motor : RobotMap.rightMotors)
 		{
-			motor.setNeutralMode(NeutralMode.Coast);
+			motor.setNeutralMode(NeutralMode.Brake);
 			motor.setInverted(true);
 			motor.set(0);
 		}
@@ -190,13 +190,13 @@ public class Robot extends IterativeRobot {
 		
 		// Gear shifting
 		/////////////////////
-		boolean triggerHighGear = RobotMap.driveStick.getTrigger();
-		boolean buttonLowGear = RobotMap.driveStick.getTop();
+		boolean triggerLowGear = RobotMap.driveStick.getTrigger();
+		boolean buttonHighGear = RobotMap.driveStick.getTop();
 		
-		if (triggerHighGear) {
-			RobotMap.shift.set(RobotMap.shiftHigh);
-		} else if (buttonLowGear) {
+		if (triggerLowGear) {
 			RobotMap.shift.set(RobotMap.shiftLow);
+		} else if (buttonHighGear) {
+			RobotMap.shift.set(RobotMap.shiftHigh);
 		} else {
 			RobotMap.shift.set(DoubleSolenoid.Value.kOff);
 		}
@@ -213,7 +213,7 @@ public class Robot extends IterativeRobot {
 	 * Autonomous methods
 	 */
 	public void baseline() {
-		drive(0, 1);
+		drive(0, -0.25);
 		while(Math.abs(RobotMap.leftMotors[0].getSelectedSensorPosition(0))
 				< RobotMap.baseline);
 		drive(0, 0);
