@@ -8,18 +8,19 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 
 public class AutoPlaceCube {
 	
-	static double config_armRaiseTime = 2.0;
+	static double config_armRaiseTime = 0.5;
 	static double config_grabberReleaseTime = 0.1;
 	
 	static double config_armRaiseSpeed = 0.2;
 	
-	SendableChooser<Character> startingPosition = new SendableChooser<Character>();
+	SendableChooser<Character> startingPosition;
 	boolean shouldPlaceCube = false;
 	Timer armRaiseTimer = new Timer();
 	Timer grabberReleaseTimer = new Timer();
 	
 	public void onRobotInit()
 	{
+		startingPosition = new SendableChooser<Character>();
 		startingPosition.addObject("Left", 'L');
 		startingPosition.addObject("Right", 'R');
 		startingPosition.addObject("Don't Place", 'X');
