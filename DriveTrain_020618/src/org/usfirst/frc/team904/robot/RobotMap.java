@@ -36,6 +36,8 @@ public class RobotMap {
 	public static DoubleSolenoid.Value grabberOpen = DoubleSolenoid.Value.kForward;
 	
 	public static Joystick driveStick = new Joystick(0);
+	
+	public static boolean highGear;
 
 	// channels for controls on the drive controller,
 	// shown as axes on the driver station when looking at USB devices

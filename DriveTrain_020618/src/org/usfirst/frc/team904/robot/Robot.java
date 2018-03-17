@@ -46,7 +46,7 @@ public class Robot extends IterativeRobot {
 	 */
 	@Override
 	public void robotInit() {
-		m_chooser.addDefault("Default Auto", kDefaultAuto);
+		m_chooser.addDefault("Do Nothing", kDefaultAuto);
 		m_chooser.addObject("Baseline", kBaselineAuto);
 		//m_chooser.addObject("Turn Right Red", kVisionAutoRightRed);
 		//m_chooser.addObject("Turn Right Blue", kVisionAutoRightBlue);
@@ -81,6 +81,8 @@ public class Robot extends IterativeRobot {
 		RobotMap.outputStream = CameraServer.getInstance().putVideo("Blur", 640, 480);
 		
 		RobotMap.camera.setExposureAuto();
+		
+		RobotMap.highGear = false;
 	}
 
 	/**
@@ -156,7 +158,7 @@ public class Robot extends IterativeRobot {
 						}*/
 				  }
                 }
-				break;
+                break;
 			case kDefaultAuto:
 			default:
 				// Do Nothing
@@ -205,8 +207,12 @@ public class Robot extends IterativeRobot {
 		
 		if (triggerLowGear) {
 			RobotMap.shift.set(RobotMap.shiftLow);
+			RobotMap.highGear = false;
+			SmartDashboard.putBoolean("High Gear:", RobotMap.highGear);
 		} else if (buttonHighGear) {
 			RobotMap.shift.set(RobotMap.shiftHigh);
+			RobotMap.highGear = true;
+			SmartDashboard.putBoolean("High Gear:", RobotMap.highGear);
 		} else {
 			RobotMap.shift.set(DoubleSolenoid.Value.kOff);
 		}
@@ -289,7 +295,7 @@ public class Robot extends IterativeRobot {
 	}
 	
 	public double[] deadzone(double x, double y) {	
-		return new double[] {deadzone(x), deadzone(y)};
+		return new double[] {(deadzone(x) * 0.5), (deadzone(y) * 0.5)};
 	}
 	
 	public void drive(double turn, double forward) {
