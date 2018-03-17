@@ -39,9 +39,14 @@ public class AutoPlaceCube {
 			.getInstance()
 			.getGameSpecificMessage();
 			
-		char robotSide = startingPosition.getSelected().charAt(0);
+		String robotSide = startingPosition.getSelected();
+		if(robotSide == null) {robotSide = "X";}
+		if(robotSide.length() != 1) {robotSide = "X";}
 		
-		if(robotSide != 'X' && fieldSides.length() == 3 && robotSide == fieldSides.charAt(0))
+		if(
+				robotSide.charAt(0) != 'X'
+				&& fieldSides.length() == 3
+				&& robotSide.charAt(0) == fieldSides.charAt(0))
 		{
 			shouldPlaceCube = true;
 		}
