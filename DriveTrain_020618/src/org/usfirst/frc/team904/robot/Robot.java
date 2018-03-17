@@ -34,8 +34,6 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 public class Robot extends IterativeRobot {
 	private static final String kDefaultAuto = "Default";
 	private static final String kBaselineAuto = "My Auto";
-	private static final String kVisionAutoRightRed = "Red";
-	private static final String kVisionAutoRightBlue = "Blue";
 	private String m_autoSelected;
 	private SendableChooser<String> m_chooser = new SendableChooser<>();
 	
@@ -52,7 +50,7 @@ public class Robot extends IterativeRobot {
 		m_chooser.addObject("Baseline", kBaselineAuto);
 		//m_chooser.addObject("Turn Right Red", kVisionAutoRightRed);
 		//m_chooser.addObject("Turn Right Blue", kVisionAutoRightBlue);
-		SmartDashboard.putData("Auto choices", m_chooser);
+		//SmartDashboard.putData("Auto choices", m_chooser);
 		
 		for(WPI_TalonSRX motor : RobotMap.leftMotors)
 		{
@@ -84,7 +82,9 @@ public class Robot extends IterativeRobot {
 		
 		RobotMap.camera.setExposureAuto();
 		
-		autoPlaceCube.onRobotInit();
+		m_chooser.addObject("Left", "L");
+		m_chooser.addObject("Right", "R");
+		SmartDashboard.putData("Starting position", m_chooser);
 	}
 
 	/**
@@ -111,8 +111,9 @@ public class Robot extends IterativeRobot {
 		RobotMap.leftMotors[0].setSelectedSensorPosition(0, 0, 100);
 		
 		RobotMap.hitBaseline = false;
+		RobotMap.armUp = false;
 		
-		autoPlaceCube.onAutonomousInit();
+		autoPlaceCube.onAutonomousInit(m_autoSelected);
 	}
 
 	/**
@@ -124,38 +125,15 @@ public class Robot extends IterativeRobot {
 			case kBaselineAuto:
 				baseline();
 				break;
-			case kVisionAutoRightRed:
-				baseline();
-				turn(RobotMap.right);
-				if(pixVal()) {
-					//place cube on switch
-					RobotMap.shift.set(RobotMap.shiftHigh);
-				} else {
-					//go and check scale
-					/*turn(RobotMap.left);
-					toScale();
-					turn(RobotMap.right);
-					if(pixVal()) {
-						// place cube on scale
-						RobotMap.shift.set(RobotMap.shiftHigh);
-					}*/
+			case "L":
+			case "R":
+				RobotMap.armUp = autoPlaceCube.raiseArm();
+				if(RobotMap.armUp) {
+					baseline();
 				}
-				break;
-			case kVisionAutoRightBlue:
-				baseline();
-				turn(RobotMap.right);
-				if(!pixVal()) {
-					//place cube on switch
-					RobotMap.shift.set(RobotMap.shiftHigh);
-				} else {
-					//go and check scale
-					/*turn(RobotMap.left);
-					toScale();
-					turn(RobotMap.right);
-					if(pixVal()) {
-						// place cube on scale
-						RobotMap.shift.set(RobotMap.shiftHigh);
-					}*/
+				if(RobotMap.hitBaseline) {
+					autoPlaceCube.maybePlaceCube();
+					SmartDashboard.putString("Status", "releasing cube");
 				}
 				break;
 			case kDefaultAuto:
@@ -225,10 +203,11 @@ public class Robot extends IterativeRobot {
 	 */
 	public void baseline() {
 		SmartDashboard.putNumber("encoder", RobotMap.leftMotors[0].getSelectedSensorPosition(0));
-		if(RobotMap.hitBaseline)
-			autoPlaceCube.maybePlaceCube();
 		if(!RobotMap.hitBaseline)
+		{
 			drive(0, -0.25);
+			SmartDashboard.putString("Status", "baseline");
+		}
 		if(Math.abs(RobotMap.leftMotors[0].getSelectedSensorPosition(0)) >= RobotMap.baseline) {
 			drive(0, 0);
 			RobotMap.hitBaseline = true;

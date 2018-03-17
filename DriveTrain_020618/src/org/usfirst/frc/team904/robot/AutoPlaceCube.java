@@ -13,21 +13,11 @@ public class AutoPlaceCube {
 	
 	static double config_armRaiseSpeed = 0.2;
 	
-	SendableChooser<String> startingPosition;
 	boolean shouldPlaceCube = false;
 	Timer armRaiseTimer = new Timer();
 	Timer grabberReleaseTimer = new Timer();
 	
-	public void onRobotInit()
-	{
-		startingPosition = new SendableChooser<>();
-		startingPosition.addObject("Left", "L");
-		startingPosition.addObject("Right", "R");
-		startingPosition.addObject("Don't Place", "X");
-		SmartDashboard.putData("Starting position", startingPosition);
-	}
-	
-	public void onAutonomousInit()
+	public void onAutonomousInit(String robotSide)
 	{
 		armRaiseTimer.stop();
 		armRaiseTimer.reset();
@@ -39,7 +29,6 @@ public class AutoPlaceCube {
 			.getInstance()
 			.getGameSpecificMessage();
 			
-		String robotSide = startingPosition.getSelected();
 		if(robotSide == null) {robotSide = "X";}
 		if(robotSide.length() != 1) {robotSide = "X";}
 		
@@ -52,16 +41,30 @@ public class AutoPlaceCube {
 		}
 	}
 	
-	public void maybePlaceCube()
+	public boolean raiseArm()
 	{
 		if(shouldPlaceCube)
 		{
 			if(armRaiseTimer.get() == 0)
 			{
+				SmartDashboard.putString("Status", "raising arm");
 				armRaiseTimer.start();
 				RobotMap.arms.set(config_armRaiseSpeed);
 			}
-			
+			if(armRaiseTimer.get() > config_armRaiseTime)
+			{
+				armRaiseTimer.stop();
+				RobotMap.arms.set(0);
+				return true;
+			}
+		}
+		return false;
+	}
+	
+	public void maybePlaceCube()
+	{
+		if(shouldPlaceCube)
+		{
 			if(armRaiseTimer.get() > config_armRaiseTime)
 			{
 				armRaiseTimer.stop();
