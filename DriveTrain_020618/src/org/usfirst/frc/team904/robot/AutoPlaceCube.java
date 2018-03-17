@@ -13,17 +13,17 @@ public class AutoPlaceCube {
 	
 	static double config_armRaiseSpeed = 0.2;
 	
-	SendableChooser<Character> startingPosition;
+	SendableChooser<String> startingPosition;
 	boolean shouldPlaceCube = false;
 	Timer armRaiseTimer = new Timer();
 	Timer grabberReleaseTimer = new Timer();
 	
 	public void onRobotInit()
 	{
-		startingPosition = new SendableChooser<Character>();
-		startingPosition.addObject("Left", 'L');
-		startingPosition.addObject("Right", 'R');
-		startingPosition.addObject("Don't Place", 'X');
+		startingPosition = new SendableChooser<>();
+		startingPosition.addObject("Left", "L");
+		startingPosition.addObject("Right", "R");
+		startingPosition.addObject("Don't Place", "X");
 		SmartDashboard.putData("Starting position", startingPosition);
 	}
 	
@@ -39,9 +39,9 @@ public class AutoPlaceCube {
 			.getInstance()
 			.getGameSpecificMessage();
 			
-		char robotSide = startingPosition.getSelected();
+		char robotSide = startingPosition.getSelected().charAt(0);
 		
-		if(robotSide != 'X' && robotSide == fieldSides.charAt(0))
+		if(robotSide != 'X' && fieldSides.length() == 3 && robotSide == fieldSides.charAt(0))
 		{
 			shouldPlaceCube = true;
 		}
