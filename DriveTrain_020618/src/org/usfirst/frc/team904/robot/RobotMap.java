@@ -38,6 +38,8 @@ public class RobotMap {
 	public static Joystick driveStick = new Joystick(0);
 	
 	public static boolean highGear;
+	
+	public static double encoderRatio;
 
 	// channels for controls on the drive controller,
 	// shown as axes on the driver station when looking at USB devices

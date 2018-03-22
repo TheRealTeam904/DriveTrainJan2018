@@ -103,6 +103,7 @@ public class Robot extends IterativeRobot {
 		// System.out.println("Auto selected: " + m_autoSelected);
 		
 		RobotMap.leftMotors[0].configSelectedFeedbackSensor(FeedbackDevice.CTRE_MagEncoder_Relative, 0, 10);
+		RobotMap.rightMotors[0].configSelectedFeedbackSensor(FeedbackDevice.CTRE_MagEncoder_Relative, 0, 10);
 		
 		RobotMap.camera.setExposureManual(50);
 		
@@ -177,7 +178,7 @@ public class Robot extends IterativeRobot {
 		double[] xy = deadzone(
 				RobotMap.driveStick.getRawAxis(RobotMap.driveStickTurnAxis),
 				RobotMap.driveStick.getRawAxis(RobotMap.driveStickForwardAxis));
-		drive(xy[0], xy[1]);
+		drive(xy[0], xy[1], 1);
 		
 		// Accessory motors
 		/////////////////////
@@ -230,29 +231,36 @@ public class Robot extends IterativeRobot {
 	 */
 	public void baseline() {
 		SmartDashboard.putNumber("encoder", RobotMap.leftMotors[0].getSelectedSensorPosition(0));
-		if(!RobotMap.hitBaseline)
-			drive(0, -0.25);
+		if(!RobotMap.hitBaseline) {
+			RobotMap.encoderRatio = RobotMap.rightMotors[0].getSelectedSensorPosition(0)
+					/ RobotMap.leftMotors[0].getSelectedSensorPosition(0);
+			if(RobotMap.leftMotors[0].getSelectedSensorPosition(0)
+					> RobotMap.rightMotors[0].getSelectedSensorPosition(0)) {
+				RobotMap.encoderRatio = -RobotMap.encoderRatio;
+			}
+			drive(0, -0.25, RobotMap.encoderRatio);
+		}
 		if(Math.abs(RobotMap.leftMotors[0].getSelectedSensorPosition(0)) >= RobotMap.baseline) {
-			drive(0, 0);
+			drive(0, 0, 1);
 			RobotMap.hitBaseline = true;
 		}
 	}
 	
 	public void turn(int dir) {
-		drive(dir, 0);
+		drive(dir, 0, 1);
 		while(Math.abs(RobotMap.leftMotors[0].getSelectedSensorPosition(0))
 				< RobotMap.turnVal);
-		drive(0, 0);
+		drive(0, 0, 1);
 	}
 	
 	public void toScale() {
-		drive(0, 1);
+		drive(0, 1, 1);
 		while(Math.abs(RobotMap.leftMotors[0].getSelectedSensorPosition(0))
 				< RobotMap.scaleDist);
-		drive(0, 0);
+		drive(0, 0, 1);
 	}
 	
-	public boolean pixVal() {
+/*	public boolean pixVal() {
 		double red = 0;
 		double blue = 0;
 		
@@ -278,7 +286,7 @@ public class Robot extends IterativeRobot {
 			return true;
 		else
 			return false;
-	}
+	}*/
 	
 	/**
 	 * Drive methods
@@ -298,9 +306,20 @@ public class Robot extends IterativeRobot {
 		return new double[] {(deadzone(x) * 0.5), (deadzone(y) * 0.5)};
 	}
 	
-	public void drive(double turn, double forward) {
-		double motorLeft = (forward + turn);
-		double motorRight = (forward - turn);
+	public void drive(double turn, double forward, double ratio) {
+		double motorLeft;
+		double motorRight;
+		if (ratio < 1) {
+			motorLeft = ((forward * (-ratio)) + turn);
+		} else {
+			motorLeft = (forward + turn);
+		}
+		
+		if (ratio > 1) {
+			motorRight = ((forward * ratio) - turn);
+		} else {
+			motorRight = (forward - turn);
+		}
 		
 		double scaleFactor;
 		
