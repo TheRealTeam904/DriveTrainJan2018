@@ -64,6 +64,13 @@ public class Robot extends IterativeRobot {
 			motor.setInverted(true);
 			motor.set(0);
 		}
+		
+		RobotMap.IntakeLeftMotor.setNeutralMode(NeutralMode.Coast);
+		RobotMap.IntakeRightMotor.setNeutralMode(NeutralMode.Coast);
+		RobotMap.IntakeLeftMotor.setInverted(false); //
+		RobotMap.IntakeRightMotor.setInverted(true); // switch these if the intake motors are backwards
+		RobotMap.IntakeLeftMotor.set(0);
+		RobotMap.IntakeRightMotor.set(0);
 
 		RobotMap.climber.setNeutralMode(NeutralMode.Brake);
 		RobotMap.climber.set(0);
@@ -198,6 +205,18 @@ public class Robot extends IterativeRobot {
 		else
 		{
 			RobotMap.grabber.set(DoubleSolenoid.Value.kOff);
+		}
+		
+		// Grabber intake wheels
+		if(RobotMap.controller.getRawButton(RobotMap.accessoryStickIntakeStartButton))
+		{
+			RobotMap.IntakeLeftMotor.set(RobotMap.intakeMotorSpeed);
+			RobotMap.IntakeRightMotor.set(RobotMap.intakeMotorSpeed);
+		}
+		else if(RobotMap.controller.getRawButton(RobotMap.accessoryStickIntakeStopButton))
+		{
+			RobotMap.IntakeLeftMotor.set(0);
+			RobotMap.IntakeRightMotor.set(0);
 		}
 		
 		

@@ -21,11 +21,14 @@ import edu.wpi.first.wpilibj.XboxController;
 
 public class RobotMap {
 
-	public static WPI_TalonSRX[] leftMotors = {new WPI_TalonSRX(2), new WPI_TalonSRX(3), new WPI_TalonSRX(4)};
-	public static WPI_TalonSRX[] rightMotors = {new WPI_TalonSRX(5), new WPI_TalonSRX(6), new WPI_TalonSRX(7)};
+	public static WPI_TalonSRX[] leftMotors = {new WPI_TalonSRX(2), new WPI_TalonSRX(3)};
+	public static WPI_TalonSRX[] rightMotors = {new WPI_TalonSRX(5), new WPI_TalonSRX(6)};
 
 	public static WPI_TalonSRX arms = new WPI_TalonSRX(9);
 	public static WPI_TalonSRX climber = new WPI_TalonSRX(8);
+	
+	public static WPI_TalonSRX IntakeLeftMotor = new WPI_TalonSRX(4);
+	public static WPI_TalonSRX IntakeRightMotor = new WPI_TalonSRX(7);
 
 	public static DoubleSolenoid shift = new DoubleSolenoid(0, 1);
 	public static DoubleSolenoid.Value shiftLow = DoubleSolenoid.Value.kReverse;
@@ -54,9 +57,13 @@ public class RobotMap {
 	public static int accessoryStickClimbAxis = 1;
 	public static int accessoryStickGrabberGrabTrigger = 3;
 	public static int accessoryStickGrabberReleaseTrigger = 2;
+	public static int accessoryStickIntakeStartButton = 5;
+	public static int accessoryStickIntakeStopButton = 4;
 
 	// motor speed control
 	public static final double driveMotorSpeedScale = 0.5;
+	public static final double intakeMotorSpeed = 1.0;
+	
 	// encoder values to disable high gear to resist tipping the robot
 	public static final double elevation = 0.0; // climber elevation
 	public static final double extend = 0.0; // arm extension
