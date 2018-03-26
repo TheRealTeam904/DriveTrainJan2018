@@ -234,10 +234,6 @@ public class Robot extends IterativeRobot {
 		if(!RobotMap.hitBaseline) {
 			RobotMap.encoderRatio = RobotMap.rightMotors[0].getSelectedSensorPosition(0)
 					/ RobotMap.leftMotors[0].getSelectedSensorPosition(0);
-			if(RobotMap.leftMotors[0].getSelectedSensorPosition(0)
-					> RobotMap.rightMotors[0].getSelectedSensorPosition(0)) {
-				RobotMap.encoderRatio = -RobotMap.encoderRatio;
-			}
 			drive(0, -0.25, RobotMap.encoderRatio);
 		}
 		if(Math.abs(RobotMap.leftMotors[0].getSelectedSensorPosition(0)) >= RobotMap.baseline) {
@@ -303,23 +299,26 @@ public class Robot extends IterativeRobot {
 	}
 	
 	public double[] deadzone(double x, double y) {	
-		return new double[] {(deadzone(x) * 0.5), (deadzone(y) * 0.5)};
+		return new double[] {deadzone(x), deadzone(y)};
 	}
 	
 	public void drive(double turn, double forward, double ratio) {
 		double motorLeft;
 		double motorRight;
 		if (ratio < 1) {
-			motorLeft = ((forward * (-ratio)) + turn);
+			motorLeft = ((forward * ratio) + turn);
 		} else {
 			motorLeft = (forward + turn);
 		}
 		
 		if (ratio > 1) {
-			motorRight = ((forward * ratio) - turn);
+			motorRight = ((forward / ratio) - turn);
 		} else {
 			motorRight = (forward - turn);
 		}
+		
+		motorLeft *= RobotMap.driveMotorSpeedScale;
+		motorRight *= RobotMap.driveMotorSpeedScale;
 		
 		double scaleFactor;
 		
