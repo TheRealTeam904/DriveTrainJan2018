@@ -208,12 +208,17 @@ public class Robot extends IterativeRobot {
 		}
 		
 		// Grabber intake wheels
-		if(RobotMap.controller.getRawButton(RobotMap.accessoryStickIntakeStartButton))
+		if(RobotMap.controller.getRawButton(RobotMap.accessoryStickCubeIntakeButton))
 		{
 			RobotMap.IntakeLeftMotor.set(RobotMap.intakeMotorSpeed);
 			RobotMap.IntakeRightMotor.set(RobotMap.intakeMotorSpeed);
 		}
-		else if(RobotMap.controller.getRawButton(RobotMap.accessoryStickIntakeStopButton))
+		else if(RobotMap.controller.getRawButton(RobotMap.accessoryStickCubeOutputButton))
+		{
+			RobotMap.IntakeLeftMotor.set(-RobotMap.intakeMotorSpeed);
+			RobotMap.IntakeRightMotor.set(-RobotMap.intakeMotorSpeed);
+		}
+		else
 		{
 			RobotMap.IntakeLeftMotor.set(0);
 			RobotMap.IntakeRightMotor.set(0);

@@ -57,8 +57,8 @@ public class RobotMap {
 	public static int accessoryStickClimbAxis = 1;
 	public static int accessoryStickGrabberGrabTrigger = 3;
 	public static int accessoryStickGrabberReleaseTrigger = 2;
-	public static int accessoryStickIntakeStartButton = 5;
-	public static int accessoryStickIntakeStopButton = 4;
+	public static int accessoryStickCubeIntakeButton = 6;
+	public static int accessoryStickCubeOutputButton = 5;
 
 	// motor speed control
 	public static final double driveMotorSpeedScale = 0.5;
