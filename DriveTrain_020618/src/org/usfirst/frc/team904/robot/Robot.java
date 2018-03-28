@@ -114,6 +114,10 @@ public class Robot extends IterativeRobot {
 		
 		RobotMap.hitBaseline = false;
 		RobotMap.armUp = false;
+		RobotMap.climberUp = false;
+		RobotMap.atScale = false;
+		RobotMap.atSwitch = false;
+		RobotMap.turned = false;
 		
 		autoPlaceCube.onAutonomousInit(m_autoSelected);
 	}
@@ -123,6 +127,8 @@ public class Robot extends IterativeRobot {
 	 */
 	@Override
 	public void autonomousPeriodic() {
+		RobotMap.armEncoderVal = RobotMap.armEncoder.get();
+		SmartDashboard.putNumber("arm encoder", RobotMap.armEncoderVal);
 		switch (m_autoSelected) {
 			case kBaselineAuto:
 				baseline();
@@ -164,6 +170,8 @@ public class Robot extends IterativeRobot {
 		
 		// Accessory motors
 		/////////////////////
+		RobotMap.armEncoderVal = RobotMap.armEncoder.get();
+		SmartDashboard.putNumber("arm encoder", RobotMap.armEncoderVal);
 		RobotMap.arms.set(deadzone(RobotMap.controller.getRawAxis(RobotMap.accessoryStickArmsAxis)));
 		RobotMap.climber.set(deadzone(RobotMap.controller.getRawAxis(RobotMap.accessoryStickClimbAxis)));
 		

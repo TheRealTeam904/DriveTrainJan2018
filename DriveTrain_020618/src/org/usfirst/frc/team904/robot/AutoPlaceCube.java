@@ -8,7 +8,7 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 
 public class AutoPlaceCube {
 	
-	static double config_climberRaiseTime = 0.5;
+	static double config_climberRaiseTime = 2;
 	static double config_grabberReleaseTime = 0.1;
 	
 	static double config_armRaiseSpeed = 0.2;
@@ -55,14 +55,14 @@ public class AutoPlaceCube {
 		
 		if(placeCubeScale || placeCubeSwitch)
 		{
-			if(RobotMap.armEncoderVal <= RobotMap.armEncoderLimit)
+			if(Math.abs(RobotMap.armEncoderVal) <= RobotMap.armEncoderLimit)
 			{
-				RobotMap.armEncoderVal += 1000;
+				RobotMap.armEncoderVal = RobotMap.armEncoder.get();
 				SmartDashboard.putString("Status", "raising arm");
 				SmartDashboard.putNumber("arm encoder", RobotMap.armEncoderVal);
 				RobotMap.arms.set(config_armRaiseSpeed);
 			}
-			if(RobotMap.armEncoderVal >= RobotMap.armEncoderLimit)
+			if(Math.abs(RobotMap.armEncoderVal) >= RobotMap.armEncoderLimit)
 			{
 				RobotMap.arms.set(0);
 				return true;

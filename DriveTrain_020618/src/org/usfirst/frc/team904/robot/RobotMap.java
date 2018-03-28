@@ -40,7 +40,7 @@ public class RobotMap {
 	
 	public static boolean highGear;
 	
-	public static Encoder armEncoder = new Encoder(0, 0);
+	public static Encoder armEncoder = new Encoder(0, 1);
 
 	// channels for controls on the drive controller,
 	// shown as axes on the driver station when looking at USB devices
@@ -67,7 +67,7 @@ public class RobotMap {
 	public static final int turnVal = 10000;
 	public static final int scaleDist = 21200;
 	public static final int switchDist = 7000;
-	public static final int armEncoderLimit = 3000;
+	public static final int armEncoderLimit = 100;
 	
 	public static boolean hitBaseline;
 	public static boolean armUp;
