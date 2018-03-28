@@ -8,19 +8,21 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 
 public class AutoPlaceCube {
 	
-	static double config_armRaiseTime = 0.5;
+	static double config_climberRaiseTime = 0.5;
 	static double config_grabberReleaseTime = 0.1;
 	
 	static double config_armRaiseSpeed = 0.2;
+	static double config_climberRaiseSpeed = 1.0;
 	
-	boolean shouldPlaceCube = false;
-	Timer armRaiseTimer = new Timer();
+	boolean placeCubeScale = false;
+	boolean placeCubeSwitch = false;
+	Timer climberRaiseTimer = new Timer();
 	Timer grabberReleaseTimer = new Timer();
 	
 	public void onAutonomousInit(String robotSide)
 	{
-		armRaiseTimer.stop();
-		armRaiseTimer.reset();
+		climberRaiseTimer.stop();
+		climberRaiseTimer.reset();
 		
 		grabberReleaseTimer.stop();
 		grabberReleaseTimer.reset();
@@ -35,26 +37,54 @@ public class AutoPlaceCube {
 		if(
 				robotSide.charAt(0) != 'X'
 				&& fieldSides.length() == 3
+				&& robotSide.charAt(0) == fieldSides.charAt(1))
+		{
+			placeCubeScale = true;
+			
+		} else if(
+				robotSide.charAt(0) != 'X'
+				&& fieldSides.length() == 3
 				&& robotSide.charAt(0) == fieldSides.charAt(0))
 		{
-			shouldPlaceCube = true;
+			placeCubeSwitch = true;
 		}
 	}
 	
 	public boolean raiseArm()
 	{
-		if(shouldPlaceCube)
+		
+		if(placeCubeScale || placeCubeSwitch)
 		{
-			if(armRaiseTimer.get() == 0)
+			if(RobotMap.armEncoderVal <= RobotMap.armEncoderLimit)
 			{
+				RobotMap.armEncoderVal += 1000;
 				SmartDashboard.putString("Status", "raising arm");
-				armRaiseTimer.start();
+				SmartDashboard.putNumber("arm encoder", RobotMap.armEncoderVal);
 				RobotMap.arms.set(config_armRaiseSpeed);
 			}
-			if(armRaiseTimer.get() > config_armRaiseTime)
+			if(RobotMap.armEncoderVal >= RobotMap.armEncoderLimit)
 			{
-				armRaiseTimer.stop();
 				RobotMap.arms.set(0);
+				return true;
+			}
+		}
+		return false;
+	}
+	
+	public boolean raiseClimber()
+	{
+		if(placeCubeScale)
+		{
+			if(climberRaiseTimer.get() == 0)
+			{
+				SmartDashboard.putString("Status", "raising arm");
+				climberRaiseTimer.start();
+				RobotMap.climber.set(config_climberRaiseSpeed);
+			}
+			if(climberRaiseTimer.get() > config_climberRaiseTime)
+			{
+				climberRaiseTimer.stop();
+				RobotMap.climber.set(0);
 				return true;
 			}
 		}
@@ -63,11 +93,11 @@ public class AutoPlaceCube {
 	
 	public void maybePlaceCube()
 	{
-		if(shouldPlaceCube)
+		if(placeCubeScale || placeCubeSwitch)
 		{
-			if(armRaiseTimer.get() > config_armRaiseTime)
+			if(climberRaiseTimer.get() > config_climberRaiseTime)
 			{
-				armRaiseTimer.stop();
+				climberRaiseTimer.stop();
 				RobotMap.arms.set(0);
 				
 				if(grabberReleaseTimer.get() == 0)

@@ -123,18 +123,21 @@ public class Robot extends IterativeRobot {
 	 */
 	@Override
 	public void autonomousPeriodic() {
-		String gameData;
 		switch (m_autoSelected) {
 			case kBaselineAuto:
 				baseline();
 				break;
 			case "L":
 			case "R":
-				RobotMap.armUp = autoPlaceCube.raiseArm();
-				if(RobotMap.armUp) {
-					baseline();
-				}
+				RobotMap.climberUp = autoPlaceCube.raiseClimber();
+				baseline();
 				if(RobotMap.hitBaseline) {
+					RobotMap.armUp = autoPlaceCube.raiseArm();
+				}
+				if(RobotMap.armUp && autoPlaceCube.placeCubeScale) {
+					toScale();
+				}
+				if(RobotMap.atScale) {
 					autoPlaceCube.maybePlaceCube();
 					SmartDashboard.putString("Status", "releasing cube");
 				}
@@ -221,18 +224,40 @@ public class Robot extends IterativeRobot {
 		}
 	}
 	
-	public void turn(int dir) {
-		drive(dir, 0);
-		while(Math.abs(RobotMap.leftMotors[0].getSelectedSensorPosition(0))
-				< RobotMap.turnVal);
-		drive(0, 0);
+	public void turn(double dir) {
+		if(!RobotMap.turned)
+		{
+			drive(dir, 0);
+			SmartDashboard.putString("Status", "turn");
+		}
+		if(Math.abs(RobotMap.leftMotors[0].getSelectedSensorPosition(0)) >= RobotMap.turnVal) {
+			drive(0, 0);
+			RobotMap.turned = true;
+		}
 	}
 	
 	public void toScale() {
-		drive(0, 1);
-		while(Math.abs(RobotMap.leftMotors[0].getSelectedSensorPosition(0))
-				< RobotMap.scaleDist);
-		drive(0, 0);
+		if(!RobotMap.atScale)
+		{
+			drive(0, -0.25);
+			SmartDashboard.putString("Status", "scale");
+		}
+		if(Math.abs(RobotMap.leftMotors[0].getSelectedSensorPosition(0)) >= RobotMap.scaleDist) {
+			drive(0, 0);
+			RobotMap.atScale = true;
+		}
+	}
+	
+	public void toSwitch() {
+		if(!RobotMap.atSwitch)
+		{
+			drive(0, -0.25);
+			SmartDashboard.putString("Status", "switch");
+		}
+		if(Math.abs(RobotMap.leftMotors[0].getSelectedSensorPosition(0)) >= RobotMap.switchDist) {
+			drive(0, 0);
+			RobotMap.atSwitch = true;
+		}
 	}
 	
 	public boolean pixVal() {
