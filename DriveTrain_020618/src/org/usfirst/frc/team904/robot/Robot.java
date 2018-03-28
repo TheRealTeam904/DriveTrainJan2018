@@ -111,6 +111,7 @@ public class Robot extends IterativeRobot {
 		RobotMap.camera.setExposureManual(50);
 		
 		RobotMap.leftMotors[0].setSelectedSensorPosition(0, 0, 100);
+		RobotMap.armEncoder.reset();
 		
 		RobotMap.hitBaseline = false;
 		RobotMap.armUp = false;
@@ -119,7 +120,12 @@ public class Robot extends IterativeRobot {
 		RobotMap.atSwitch = false;
 		RobotMap.turned = false;
 		
+		RobotMap.highGear = false;
+		
 		autoPlaceCube.onAutonomousInit(m_autoSelected);
+		
+		SmartDashboard.putBoolean("Switch Auton", autoPlaceCube.placeCubeSwitch);
+		SmartDashboard.putBoolean("Scale Auton", autoPlaceCube.placeCubeScale);
 	}
 
 	/**
@@ -137,13 +143,23 @@ public class Robot extends IterativeRobot {
 			case "R":
 				RobotMap.climberUp = autoPlaceCube.raiseClimber();
 				baseline();
-				if(RobotMap.hitBaseline) {
+				if(RobotMap.hitBaseline && autoPlaceCube.placeCubeScale) {
+					nearScale();
+				}
+				if(RobotMap.nearScale && autoPlaceCube.placeCubeScale && !RobotMap.armUp) {
 					RobotMap.armUp = autoPlaceCube.raiseArm();
+					RobotMap.atScale = false;
 				}
 				if(RobotMap.armUp && autoPlaceCube.placeCubeScale) {
 					toScale();
 				}
-				if(RobotMap.atScale) {
+				if(RobotMap.armUp && autoPlaceCube.placeCubeSwitch) {
+					//
+					if(RobotMap.turned) {
+						toSwitch();
+					}
+				}
+				if(RobotMap.atScale || RobotMap.atSwitch) {
 					autoPlaceCube.maybePlaceCube();
 					SmartDashboard.putString("Status", "releasing cube");
 				}
@@ -241,6 +257,18 @@ public class Robot extends IterativeRobot {
 		if(Math.abs(RobotMap.leftMotors[0].getSelectedSensorPosition(0)) >= RobotMap.turnVal) {
 			drive(0, 0);
 			RobotMap.turned = true;
+		}
+	}
+
+	public void nearScale() {
+		if(!RobotMap.nearScale)
+		{
+			drive(0, -0.25);
+			SmartDashboard.putString("Status", "scale");
+		}
+		if(Math.abs(RobotMap.leftMotors[0].getSelectedSensorPosition(0)) >= RobotMap.nearScaleDist) {
+			drive(0, 0);
+			RobotMap.nearScale = true;
 		}
 	}
 	

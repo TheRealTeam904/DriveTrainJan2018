@@ -8,11 +8,11 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 
 public class AutoPlaceCube {
 	
-	static double config_climberRaiseTime = 2;
+	static double config_climberRaiseTime = 5;
 	static double config_grabberReleaseTime = 0.1;
 	
-	static double config_armRaiseSpeed = 0.2;
-	static double config_climberRaiseSpeed = 1.0;
+	static double config_armRaiseSpeed = -0.2;
+	static double config_climberRaiseSpeed = -1.0;
 	
 	boolean placeCubeScale = false;
 	boolean placeCubeSwitch = false;
@@ -75,7 +75,7 @@ public class AutoPlaceCube {
 	{
 		if(placeCubeScale)
 		{
-			if(climberRaiseTimer.get() == 0)
+			if(climberRaiseTimer.get() < config_climberRaiseTime)
 			{
 				SmartDashboard.putString("Status", "raising arm");
 				climberRaiseTimer.start();
