@@ -11,6 +11,7 @@ import edu.wpi.cscore.UsbCamera;
 import edu.wpi.first.wpilibj.CameraServer;
 import edu.wpi.first.wpilibj.DoubleSolenoid;
 import edu.wpi.first.wpilibj.Joystick;
+import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.XboxController;
 
 /**
@@ -57,17 +58,24 @@ public class RobotMap {
 	public static final double elevation = 0.0; // climber elevation
 	public static final double extend = 0.0; // arm extension
 	
-	// encoder values for auton
+	// values and flags for auton
 	public static final int left = -1;
 	public static final int right = 1;
 	public static final int baseline = 67000;
-	public static boolean hitBaseline;
-	public static final int turnVal = 1000;
-	public static final int scaleDist = 21200;
-	public static final int blueVal = 0xFF0000;
-	public static final int redVal = 0x0000FF;
+	public static final int switchDist = baseline + 10000;
+	public static final int turnVal = switchDist + 10000;
+	public static final int bumpSwitch = turnVal + 10000;
 	
-	// visual processing
+	public static boolean hitBaseline;
+	public static boolean nearSwitch;
+	public static boolean turned;
+	public static boolean atSwitch;
+	
+	public static boolean armUp;
+	public static final double armTime = 0.5;
+	public static final double grabberTime = 0.2;
+	
+	// vision
 	public static Mat source = new Mat();
 	public static UsbCamera camera;
 	public static CvSink cvSink;
