@@ -116,7 +116,9 @@ public class Robot extends IterativeRobot {
 		RobotMap.hitBaseline = false;
 		RobotMap.armUp = false;
 		RobotMap.climberUp = false;
+		RobotMap.nearScale = false;
 		RobotMap.atScale = false;
+		RobotMap.nearSwitch = false;
 		RobotMap.atSwitch = false;
 		RobotMap.turned = false;
 		
@@ -152,9 +154,18 @@ public class Robot extends IterativeRobot {
 				}
 				if(RobotMap.armUp && autoPlaceCube.placeCubeScale) {
 					toScale();
+					RobotMap.armUp = autoPlaceCube.raiseArm();
 				}
 				if(RobotMap.armUp && autoPlaceCube.placeCubeSwitch) {
-					//
+					if(!RobotMap.nearSwitch) {
+						nearSwitch();
+					}
+					if(RobotMap.nearSwitch && m_autoSelected == "L") {
+						turn(RobotMap.right);
+					}
+					if(RobotMap.nearSwitch && m_autoSelected == "R") {
+						turn(RobotMap.left);
+					}
 					if(RobotMap.turned) {
 						toSwitch();
 					}
@@ -281,6 +292,18 @@ public class Robot extends IterativeRobot {
 		if(Math.abs(RobotMap.leftMotors[0].getSelectedSensorPosition(0)) >= RobotMap.scaleDist) {
 			drive(0, 0);
 			RobotMap.atScale = true;
+		}
+	}
+	
+	public void nearSwitch() {
+		if(!RobotMap.nearSwitch)
+		{
+			drive(0, -0.25);
+			SmartDashboard.putString("Status", "switch");
+		}
+		if(Math.abs(RobotMap.leftMotors[0].getSelectedSensorPosition(0)) >= RobotMap.nearSwitchDist) {
+			drive(0, 0);
+			RobotMap.nearSwitch = true;
 		}
 	}
 	

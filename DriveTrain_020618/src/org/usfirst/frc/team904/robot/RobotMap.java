@@ -64,10 +64,11 @@ public class RobotMap {
 	public static final double left = 0.25;
 	public static final double right = -0.25;
 	public static final int baseline = 67000;
-	public static final int turnVal = 74000;
-	public static final int nearScaleDist = 95000;
+	public static final int nearScaleDist = 2 * baseline;
 	public static final int scaleDist = nearScaleDist + 10000;
-	public static final int switchDist = 80000;
+	public static final int nearSwitchDist = 95000;
+	public static final int turnVal = nearSwitchDist + 10000;
+	public static final int switchDist = turnVal + 10000;
 	public static final int armEncoderLimit = 100;
 	
 	public static boolean hitBaseline;
@@ -75,6 +76,7 @@ public class RobotMap {
 	public static boolean climberUp;
 	public static boolean nearScale;
 	public static boolean atScale;
+	public static boolean nearSwitch;
 	public static boolean atSwitch;
 	public static boolean turned;
 	
