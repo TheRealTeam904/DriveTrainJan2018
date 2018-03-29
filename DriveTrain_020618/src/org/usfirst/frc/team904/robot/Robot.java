@@ -320,9 +320,9 @@ public class Robot extends IterativeRobot {
 	}
 	
 	public void drive(double turn, double forward, double ratio) {
-		double motorLeft;
-		double motorRight;
-		if (ratio < 1) {
+		double motorLeft = (forward + turn);
+		double motorRight = (forward - turn);
+		/*if (ratio < 1) {
 			motorLeft = ((forward * ratio) + turn);
 		} else {
 			motorLeft = (forward + turn);
@@ -332,7 +332,7 @@ public class Robot extends IterativeRobot {
 			motorRight = ((forward / ratio) - turn);
 		} else {
 			motorRight = (forward - turn);
-		}
+		}*/
 		
 		motorLeft *= RobotMap.driveMotorSpeedScale;
 		motorRight *= RobotMap.driveMotorSpeedScale;
