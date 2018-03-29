@@ -8,6 +8,7 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 
 public class AutoPlaceCube {
 	
+	static double config_armRaiseTime = 0.5;
 	static double config_climberRaiseTime = 5;
 	static double config_grabberReleaseTime = 0.1;
 	
@@ -16,11 +17,16 @@ public class AutoPlaceCube {
 	
 	boolean placeCubeScale = false;
 	boolean placeCubeSwitch = false;
+	
+	Timer armRaiseTimer = new Timer();
 	Timer climberRaiseTimer = new Timer();
 	Timer grabberReleaseTimer = new Timer();
 	
 	public void onAutonomousInit(String robotSide)
 	{
+		armRaiseTimer.stop();
+		armRaiseTimer.reset();
+		
 		climberRaiseTimer.stop();
 		climberRaiseTimer.reset();
 		
@@ -55,15 +61,20 @@ public class AutoPlaceCube {
 		
 		if(placeCubeScale || placeCubeSwitch)
 		{
-			if(Math.abs(RobotMap.armEncoderVal) <= RobotMap.armEncoderLimit)
+			//if(Math.abs(RobotMap.armEncoderVal) <= RobotMap.armEncoderLimit)
+			if(armRaiseTimer.get() < config_armRaiseTime)
 			{
 				RobotMap.armEncoderVal = RobotMap.armEncoder.get();
 				SmartDashboard.putString("Status", "raising arm");
 				SmartDashboard.putNumber("arm encoder", RobotMap.armEncoderVal);
+				SmartDashboard.putNumber("arm timer", armRaiseTimer.get());
+				armRaiseTimer.start();
 				RobotMap.arms.set(config_armRaiseSpeed);
 			}
-			if(Math.abs(RobotMap.armEncoderVal) >= RobotMap.armEncoderLimit)
+			//if(Math.abs(RobotMap.armEncoderVal) >= RobotMap.armEncoderLimit)
+			if(armRaiseTimer.get() >= config_armRaiseTime)
 			{
+				armRaiseTimer.stop();
 				RobotMap.arms.set(0);
 				return true;
 			}
@@ -77,11 +88,11 @@ public class AutoPlaceCube {
 		{
 			if(climberRaiseTimer.get() < config_climberRaiseTime)
 			{
-				SmartDashboard.putString("Status", "raising arm");
+				SmartDashboard.putString("Status", "raising climber");
 				climberRaiseTimer.start();
 				RobotMap.climber.set(config_climberRaiseSpeed);
 			}
-			if(climberRaiseTimer.get() > config_climberRaiseTime)
+			if(climberRaiseTimer.get() >= config_climberRaiseTime)
 			{
 				climberRaiseTimer.stop();
 				RobotMap.climber.set(0);
