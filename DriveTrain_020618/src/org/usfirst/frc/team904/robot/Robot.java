@@ -216,6 +216,22 @@ public class Robot extends IterativeRobot {
 		} else {
 			RobotMap.shift.set(DoubleSolenoid.Value.kOff);
 		}
+		
+		// Limit switch override for reset.
+				// Should be hard to trigger, we only want to do this
+				// in the pit.
+				///////////////////////////////////
+				if(RobotMap.driveStick.getRawButton(7)
+						&& RobotMap.driveStick.getRawButton(8)
+						&& RobotMap.driveStick.getRawButton(9)
+						&& RobotMap.driveStick.getRawButton(10))
+				{
+					RobotMap.climber.overrideLimitSwitchesEnable(false);
+				}
+				else
+				{
+					RobotMap.climber.overrideLimitSwitchesEnable(true);
+		}
 	}
 
 	/**
