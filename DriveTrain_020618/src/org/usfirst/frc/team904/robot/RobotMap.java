@@ -59,12 +59,12 @@ public class RobotMap {
 	public static final double extend = 0.0; // arm extension
 	
 	// values and flags for auton
-	public static final int left = -1;
-	public static final int right = 1;
+	public static final double left = -0.25;
+	public static final double right = 0.25;
 	public static final int baseline = 67000;
-	public static final int switchDist = baseline + 10000;
-	public static final int turnVal = switchDist + 10000;
-	public static final int bumpSwitch = turnVal + 10000;
+	public static final int switchDist = 72000;
+	public static final int turnVal = 74000;
+	public static final int bumpSwitch = 79000;
 	
 	public static boolean hitBaseline;
 	public static boolean nearSwitch;
@@ -72,7 +72,8 @@ public class RobotMap {
 	public static boolean atSwitch;
 	
 	public static boolean armUp;
-	public static final double armTime = 0.5;
+	public static final double armSpeed = -0.4;
+	public static final double armTime = 0.01;
 	public static final double grabberTime = 0.2;
 	
 	// vision
