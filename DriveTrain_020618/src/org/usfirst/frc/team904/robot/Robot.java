@@ -39,6 +39,7 @@ public class Robot extends IterativeRobot {
 	private SendableChooser<String> m_chooser = new SendableChooser<>();
 	public Timer armTimer = new Timer();
 	public Timer grabberTimer = new Timer();
+	private int encoderValue;
 
 
 	/**
@@ -56,12 +57,26 @@ public class Robot extends IterativeRobot {
 		
 		for(WPI_TalonSRX motor : RobotMap.leftMotors)
 		{
+			// Drive straight
+			/*motor.config_kP(0, 0.1097, 10);
+			motor.config_kI(0, 0.11333, 10);
+			motor.config_kD(0, 0, 10);
+			motor.config_kF(0, 0, 10);*/
+			
+			// Config talon
 			motor.setNeutralMode(NeutralMode.Brake);
 			motor.setInverted(false);
 			motor.set(0);
 		}
 		for(WPI_TalonSRX motor : RobotMap.rightMotors)
 		{
+			// Drive straight
+			/*motor.config_kP(0, 0.1097, 10);
+			motor.config_kI(0, 0.11333, 10);
+			motor.config_kD(0, 0, 10);
+			motor.config_kF(0, 0, 10);*/
+			
+			// Config talon
 			motor.setNeutralMode(NeutralMode.Brake);
 			motor.setInverted(true);
 			motor.set(0);
@@ -104,7 +119,7 @@ public class Robot extends IterativeRobot {
 		// m_autoSelected = SmartDashboard.getString("Auto Selector", kDefaultAuto);
 		// System.out.println("Auto selected: " + m_autoSelected);
 		
-		RobotMap.leftMotors[0].configSelectedFeedbackSensor(FeedbackDevice.CTRE_MagEncoder_Relative, 0, 10);
+		RobotMap.leftMotors[0].configSelectedFeedbackSensor(FeedbackDevice.CTRE_MagEncoder_Relative, 0, 100);
 		
 		RobotMap.camera.setExposureManual(50);
 		
@@ -261,11 +276,13 @@ public class Robot extends IterativeRobot {
 	
 	public void turn(double dir) {
 		SmartDashboard.putNumber("encoder", RobotMap.leftMotors[0].getSelectedSensorPosition(0));
-		if(!RobotMap.turned && Math.abs(RobotMap.leftMotors[0].getSelectedSensorPosition(0)) < 73000)
+		if(!RobotMap.turned)
 			drive(dir, 0);
-		if(Math.abs(RobotMap.leftMotors[0].getSelectedSensorPosition(0)) >= 73000) {
+		if(Math.abs(RobotMap.leftMotors[0].getSelectedSensorPosition(0)) >= (encoderValue + 10000)
+				|| Math.abs(RobotMap.leftMotors[0].getSelectedSensorPosition(0)) <= (encoderValue - 10000)) {
 			drive(0, 0);
 			RobotMap.turned = true;
+			encoderValue = RobotMap.leftMotors[0].getSelectedSensorPosition(0);
 		}
 	}
 	
@@ -293,9 +310,10 @@ public class Robot extends IterativeRobot {
 		SmartDashboard.putNumber("encoder", RobotMap.leftMotors[0].getSelectedSensorPosition(0));
 		if(!RobotMap.nearSwitch)
 			drive(0, -0.25);
-		if(Math.abs(RobotMap.leftMotors[0].getSelectedSensorPosition(0)) >= 72000) {
+		if(Math.abs(RobotMap.leftMotors[0].getSelectedSensorPosition(0)) >= 72000 && RobotMap.nearSwitch) {
 			drive(0, 0);
 			RobotMap.nearSwitch = true;
+			encoderValue = RobotMap.leftMotors[0].getSelectedSensorPosition(0);
 		}
 	}
 	
@@ -303,7 +321,8 @@ public class Robot extends IterativeRobot {
 		SmartDashboard.putNumber("encoder", RobotMap.leftMotors[0].getSelectedSensorPosition(0));
 		if(!RobotMap.atSwitch)
 			drive(0, -0.25);
-		if(Math.abs(RobotMap.leftMotors[0].getSelectedSensorPosition(0)) >= 74000) {
+		if(Math.abs(RobotMap.leftMotors[0].getSelectedSensorPosition(0)) <= (encoderValue - 10000)
+				|| Math.abs(RobotMap.leftMotors[0].getSelectedSensorPosition(0)) >= (encoderValue + 10000)) {
 			drive(0, 0);
 			RobotMap.atSwitch = true;
 		}
