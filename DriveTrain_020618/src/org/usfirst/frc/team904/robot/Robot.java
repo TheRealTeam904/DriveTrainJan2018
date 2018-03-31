@@ -129,6 +129,9 @@ public class Robot extends IterativeRobot {
 	 */
 	@Override
 	public void autonomousPeriodic() {
+		SmartDashboard.putBoolean("Turned", RobotMap.turned);
+		SmartDashboard.putBoolean("At Switch", RobotMap.atSwitch);
+		SmartDashboard.putBoolean("Baseline + More", RobotMap.nearSwitch);
 		String gameData;
 		switch (m_autoSelected) {
 			case kBaselineAuto:
@@ -143,12 +146,12 @@ public class Robot extends IterativeRobot {
 					  if(RobotMap.nearSwitch && !RobotMap.armUp)
 						  raiseArm();
 					  if(RobotMap.armUp)
-						  turn(RobotMap.right);
+						  turn(0.25);
 				  } else if(gameData.charAt(0) == 'R' && m_autoSelected == "R") {
 					  if(RobotMap.nearSwitch && !RobotMap.armUp)
 						  raiseArm();
 					  if(RobotMap.armUp)
-						  turn(RobotMap.left);
+						  turn(-0.25);
 				  } else {
 					  break;
 				  }
@@ -250,7 +253,7 @@ public class Robot extends IterativeRobot {
 		SmartDashboard.putNumber("encoder", RobotMap.leftMotors[0].getSelectedSensorPosition(0));
 		if(!RobotMap.hitBaseline)
 			drive(0, -0.25);
-		if(Math.abs(RobotMap.leftMotors[0].getSelectedSensorPosition(0)) >= RobotMap.baseline) {
+		if(Math.abs(RobotMap.leftMotors[0].getSelectedSensorPosition(0)) >= 67000) {
 			drive(0, 0);
 			RobotMap.hitBaseline = true;
 		}
@@ -258,9 +261,9 @@ public class Robot extends IterativeRobot {
 	
 	public void turn(double dir) {
 		SmartDashboard.putNumber("encoder", RobotMap.leftMotors[0].getSelectedSensorPosition(0));
-		if(!RobotMap.turned && Math.abs(RobotMap.leftMotors[0].getSelectedSensorPosition(0)) < 65000)
+		if(!RobotMap.turned && Math.abs(RobotMap.leftMotors[0].getSelectedSensorPosition(0)) < 73000)
 			drive(dir, 0);
-		if(Math.abs(RobotMap.leftMotors[0].getSelectedSensorPosition(0)) >= 65000) {
+		if(Math.abs(RobotMap.leftMotors[0].getSelectedSensorPosition(0)) >= 73000) {
 			drive(0, 0);
 			RobotMap.turned = true;
 		}
@@ -300,7 +303,7 @@ public class Robot extends IterativeRobot {
 		SmartDashboard.putNumber("encoder", RobotMap.leftMotors[0].getSelectedSensorPosition(0));
 		if(!RobotMap.atSwitch)
 			drive(0, -0.25);
-		if(Math.abs(RobotMap.leftMotors[0].getSelectedSensorPosition(0)) >= RobotMap.bumpSwitch) {
+		if(Math.abs(RobotMap.leftMotors[0].getSelectedSensorPosition(0)) >= 74000) {
 			drive(0, 0);
 			RobotMap.atSwitch = true;
 		}
@@ -311,6 +314,7 @@ public class Robot extends IterativeRobot {
 		{
 			grabberTimer.start();
 			RobotMap.grabber.set(RobotMap.grabberOpen);
+			SmartDashboard.putNumber("grabber timer", grabberTimer.get());
 		}
 		
 		if(grabberTimer.get() > RobotMap.grabberTime )
