@@ -100,6 +100,8 @@ public class Robot extends IterativeRobot {
 		RobotMap.camera.setExposureAuto();
 		
 		RobotMap.highGear = false;
+		
+		encoderValue = RobotMap.leftMotors[0].getSelectedSensorPosition(0);
 	}
 
 	/**
@@ -137,6 +139,11 @@ public class Robot extends IterativeRobot {
 		
 		grabberTimer.stop();
 		grabberTimer.reset();
+		
+		int encVal = 0;
+		encVal = RobotMap.leftMotors[0].getSelectedSensorPosition(0);
+		
+		SmartDashboard.putNumber("Encoder Start", encVal);
 	}
 
 	/**
@@ -150,18 +157,20 @@ public class Robot extends IterativeRobot {
 		String gameData;
 		switch (m_autoSelected) {
 			case kBaselineAuto:
-				baseline();
+				baseline(67000);
 				break;
 			case "L":
 			case "R":
 				gameData = DriverStation.getInstance().getGameSpecificMessage();
-				toSwitch();
+				//toSwitch();
+				baseline(6000);
+				SmartDashboard.putBoolean("Baseline", RobotMap.hitBaseline);
                 if(gameData.length() > 0) {
 				  if(gameData.charAt(0) == 'L' && m_autoSelected == "L") {
-					  if(RobotMap.nearSwitch && !RobotMap.armUp)
-						  raiseArm();
-					  if(RobotMap.armUp)
-						  turn(0.25);
+					  //if(RobotMap.nearSwitch && !RobotMap.armUp)
+						  //raiseArm();
+					  //if(RobotMap.armUp)
+						  if(RobotMap.hitBaseline) { turn(0.25); }
 				  } else if(gameData.charAt(0) == 'R' && m_autoSelected == "R") {
 					  if(RobotMap.nearSwitch && !RobotMap.armUp)
 						  raiseArm();
@@ -170,13 +179,13 @@ public class Robot extends IterativeRobot {
 				  } else {
 					  break;
 				  }
-				  SmartDashboard.putBoolean("ArmUp", RobotMap.armUp);
+				  /*SmartDashboard.putBoolean("ArmUp", RobotMap.armUp);
 				  if(RobotMap.turned) {
 					  bumpSwitch();
 				  }
 				  if(RobotMap.atSwitch) {
 					  dropCube();
-				  }
+				  }*/
                 }
                 break;
 			case kDefaultAuto:
@@ -264,13 +273,14 @@ public class Robot extends IterativeRobot {
 	/**
 	 * Autonomous methods
 	 */
-	public void baseline() {
+	public void baseline(int dist) {
 		SmartDashboard.putNumber("encoder", RobotMap.leftMotors[0].getSelectedSensorPosition(0));
 		if(!RobotMap.hitBaseline)
 			drive(0, -0.25);
-		if(Math.abs(RobotMap.leftMotors[0].getSelectedSensorPosition(0)) >= 67000) {
+		if(Math.abs(RobotMap.leftMotors[0].getSelectedSensorPosition(0)) >= dist) {
 			drive(0, 0);
 			RobotMap.hitBaseline = true;
+			encoderValue = RobotMap.leftMotors[0].getSelectedSensorPosition(0);
 		}
 	}
 	
@@ -278,8 +288,9 @@ public class Robot extends IterativeRobot {
 		SmartDashboard.putNumber("encoder", RobotMap.leftMotors[0].getSelectedSensorPosition(0));
 		if(!RobotMap.turned)
 			drive(dir, 0);
-		if(Math.abs(RobotMap.leftMotors[0].getSelectedSensorPosition(0)) >= (encoderValue + 10000)
-				|| Math.abs(RobotMap.leftMotors[0].getSelectedSensorPosition(0)) <= (encoderValue - 10000)) {
+		//if(Math.abs(RobotMap.leftMotors[0].getSelectedSensorPosition(0)) >= (encoderValue + 6000)
+			//	|| Math.abs(RobotMap.leftMotors[0].getSelectedSensorPosition(0)) <= (encoderValue - 6000)) {
+		if(Math.abs(RobotMap.leftMotors[0].getSelectedSensorPosition(0)) >= (encoderValue + 6000)) {
 			drive(0, 0);
 			RobotMap.turned = true;
 			encoderValue = RobotMap.leftMotors[0].getSelectedSensorPosition(0);
@@ -310,7 +321,8 @@ public class Robot extends IterativeRobot {
 		SmartDashboard.putNumber("encoder", RobotMap.leftMotors[0].getSelectedSensorPosition(0));
 		if(!RobotMap.nearSwitch)
 			drive(0, -0.25);
-		if(Math.abs(RobotMap.leftMotors[0].getSelectedSensorPosition(0)) >= 72000 && RobotMap.nearSwitch) {
+		//72000
+		if(Math.abs(RobotMap.leftMotors[0].getSelectedSensorPosition(0)) >= 6000 && RobotMap.nearSwitch) {
 			drive(0, 0);
 			RobotMap.nearSwitch = true;
 			encoderValue = RobotMap.leftMotors[0].getSelectedSensorPosition(0);
