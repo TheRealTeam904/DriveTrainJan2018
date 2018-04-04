@@ -35,6 +35,7 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 public class Robot extends IterativeRobot {
 	private static final String kDefaultAuto = "Default";
 	private static final String kBaselineAuto = "Baseline";
+	private static final double maxDrivePercent = 0.5;
 	private String m_autoSelected;
 	private SendableChooser<String> m_chooser = new SendableChooser<>();
 	public Timer armTimer = new Timer();
@@ -102,6 +103,7 @@ public class Robot extends IterativeRobot {
 		RobotMap.highGear = false;
 		
 		encoderValue = RobotMap.leftMotors[0].getSelectedSensorPosition(0);
+		SmartDashboard.putNumber("Encoder Start Init", encoderValue);
 	}
 
 	/**
@@ -163,29 +165,27 @@ public class Robot extends IterativeRobot {
 			case "R":
 				gameData = DriverStation.getInstance().getGameSpecificMessage();
 				//toSwitch();
-				baseline(6000);
-				SmartDashboard.putBoolean("Baseline", RobotMap.hitBaseline);
+				baseline(72000);
                 if(gameData.length() > 0) {
 				  if(gameData.charAt(0) == 'L' && m_autoSelected == "L") {
-					  //if(RobotMap.nearSwitch && !RobotMap.armUp)
-						  //raiseArm();
-					  //if(RobotMap.armUp)
-						  if(RobotMap.hitBaseline) { turn(0.25); }
+					  if(RobotMap.hitBaseline && !RobotMap.armUp)
+						  raiseArm();
+					  if(RobotMap.armUp)
+						  turn(0.5, 6000);
 				  } else if(gameData.charAt(0) == 'R' && m_autoSelected == "R") {
 					  if(RobotMap.nearSwitch && !RobotMap.armUp)
 						  raiseArm();
 					  if(RobotMap.armUp)
-						  turn(-0.25);
+						  turn(-0.5, 6000);
 				  } else {
 					  break;
 				  }
-				  /*SmartDashboard.putBoolean("ArmUp", RobotMap.armUp);
 				  if(RobotMap.turned) {
 					  bumpSwitch();
 				  }
 				  if(RobotMap.atSwitch) {
 					  dropCube();
-				  }*/
+				  }
                 }
                 break;
 			case kDefaultAuto:
@@ -275,8 +275,9 @@ public class Robot extends IterativeRobot {
 	 */
 	public void baseline(int dist) {
 		SmartDashboard.putNumber("encoder", RobotMap.leftMotors[0].getSelectedSensorPosition(0));
+		SmartDashboard.putBoolean("Baseline", RobotMap.hitBaseline);
 		if(!RobotMap.hitBaseline)
-			drive(0, -0.25);
+			drive(0, -0.5);
 		if(Math.abs(RobotMap.leftMotors[0].getSelectedSensorPosition(0)) >= dist) {
 			drive(0, 0);
 			RobotMap.hitBaseline = true;
@@ -284,13 +285,12 @@ public class Robot extends IterativeRobot {
 		}
 	}
 	
-	public void turn(double dir) {
+	public void turn(double dir, int dist) {
 		SmartDashboard.putNumber("encoder", RobotMap.leftMotors[0].getSelectedSensorPosition(0));
 		if(!RobotMap.turned)
 			drive(dir, 0);
-		//if(Math.abs(RobotMap.leftMotors[0].getSelectedSensorPosition(0)) >= (encoderValue + 6000)
-			//	|| Math.abs(RobotMap.leftMotors[0].getSelectedSensorPosition(0)) <= (encoderValue - 6000)) {
-		if(Math.abs(RobotMap.leftMotors[0].getSelectedSensorPosition(0)) >= (encoderValue + 6000)) {
+		if(Math.abs(RobotMap.leftMotors[0].getSelectedSensorPosition(0)) >= (Math.abs(encoderValue) + dist)
+				|| Math.abs(RobotMap.leftMotors[0].getSelectedSensorPosition(0)) <= (Math.abs(encoderValue) - dist)) {
 			drive(0, 0);
 			RobotMap.turned = true;
 			encoderValue = RobotMap.leftMotors[0].getSelectedSensorPosition(0);
@@ -298,6 +298,7 @@ public class Robot extends IterativeRobot {
 	}
 	
 	public void raiseArm() {
+		SmartDashboard.putBoolean("ArmUp", RobotMap.armUp);
 		//if(Math.abs(RobotMap.armEncoderVal) <= RobotMap.armEncoderLimit)
 		if(armTimer.get() < RobotMap.armTime)
 		{
@@ -317,24 +318,13 @@ public class Robot extends IterativeRobot {
 		}
 	}
 	
-	public void toSwitch() {
-		SmartDashboard.putNumber("encoder", RobotMap.leftMotors[0].getSelectedSensorPosition(0));
-		if(!RobotMap.nearSwitch)
-			drive(0, -0.25);
-		//72000
-		if(Math.abs(RobotMap.leftMotors[0].getSelectedSensorPosition(0)) >= 6000 && RobotMap.nearSwitch) {
-			drive(0, 0);
-			RobotMap.nearSwitch = true;
-			encoderValue = RobotMap.leftMotors[0].getSelectedSensorPosition(0);
-		}
-	}
-	
 	public void bumpSwitch() {
 		SmartDashboard.putNumber("encoder", RobotMap.leftMotors[0].getSelectedSensorPosition(0));
+		SmartDashboard.putBoolean("To Switch", RobotMap.atSwitch);
 		if(!RobotMap.atSwitch)
-			drive(0, -0.25);
-		if(Math.abs(RobotMap.leftMotors[0].getSelectedSensorPosition(0)) <= (encoderValue - 10000)
-				|| Math.abs(RobotMap.leftMotors[0].getSelectedSensorPosition(0)) >= (encoderValue + 10000)) {
+			drive(0, -0.5);
+		if(Math.abs(RobotMap.leftMotors[0].getSelectedSensorPosition(0)) <= (Math.abs(encoderValue) - 10000)
+				|| Math.abs(RobotMap.leftMotors[0].getSelectedSensorPosition(0)) >= (Math.abs(encoderValue) + 10000)) {
 			drive(0, 0);
 			RobotMap.atSwitch = true;
 		}
@@ -352,6 +342,7 @@ public class Robot extends IterativeRobot {
 		{
 			grabberTimer.stop();
 			RobotMap.grabber.set(DoubleSolenoid.Value.kOff);
+			SmartDashboard.putBoolean("Drop Cube", true);
 		}
 	}
 	
@@ -371,7 +362,7 @@ public class Robot extends IterativeRobot {
 	}
 	
 	public double[] deadzone(double x, double y) {	
-		return new double[] {(deadzone(x) * 0.5), (deadzone(y) * 0.5)};
+		return new double[] {deadzone(x), deadzone(y)};
 	}
 	
 	public void drive(double turn, double forward) {
@@ -388,6 +379,9 @@ public class Robot extends IterativeRobot {
 		
 		motorLeft = motorLeft / scaleFactor;
 		motorRight = motorRight / scaleFactor;
+		
+		motorLeft = motorLeft * maxDrivePercent;
+		motorRight = motorRight * maxDrivePercent;
 	
 		for(WPI_TalonSRX motor : RobotMap.leftMotors)
 		{
