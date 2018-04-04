@@ -59,7 +59,11 @@ public class Robot extends IterativeRobot {
 		for(WPI_TalonSRX motor : RobotMap.leftMotors)
 		{
 			// Drive straight
-			/*motor.config_kP(0, 0.1097, 10);
+			/*motor.configNominalOutputForward(0, 10);
+			motor.configNominalOutputReverse(0, 10);
+			motor.configPeakOutputForward(1, 10);
+			motor.configPeakOutputReverse(-1, 10);
+			motor.config_kP(0, 0.1097, 10);
 			motor.config_kI(0, 0.11333, 10);
 			motor.config_kD(0, 0, 10);
 			motor.config_kF(0, 0, 10);*/
@@ -72,7 +76,11 @@ public class Robot extends IterativeRobot {
 		for(WPI_TalonSRX motor : RobotMap.rightMotors)
 		{
 			// Drive straight
-			/*motor.config_kP(0, 0.1097, 10);
+			/*motor.configNominalOutputForward(0, 10);
+			motor.configNominalOutputReverse(0, 10);
+			motor.configPeakOutputForward(1, 10);
+			motor.configPeakOutputReverse(-1, 10);
+			motor.config_kP(0, 0.1097, 10);
 			motor.config_kI(0, 0.11333, 10);
 			motor.config_kD(0, 0, 10);
 			motor.config_kF(0, 0, 10);*/
@@ -144,7 +152,6 @@ public class Robot extends IterativeRobot {
 		
 		int encVal = 0;
 		encVal = RobotMap.leftMotors[0].getSelectedSensorPosition(0);
-		
 		SmartDashboard.putNumber("Encoder Start", encVal);
 	}
 
@@ -153,9 +160,6 @@ public class Robot extends IterativeRobot {
 	 */
 	@Override
 	public void autonomousPeriodic() {
-		SmartDashboard.putBoolean("Turned", RobotMap.turned);
-		SmartDashboard.putBoolean("At Switch", RobotMap.atSwitch);
-		SmartDashboard.putBoolean("Baseline + More", RobotMap.nearSwitch);
 		String gameData;
 		switch (m_autoSelected) {
 			case kBaselineAuto:
@@ -287,6 +291,7 @@ public class Robot extends IterativeRobot {
 	
 	public void turn(double dir, int dist) {
 		SmartDashboard.putNumber("encoder", RobotMap.leftMotors[0].getSelectedSensorPosition(0));
+		SmartDashboard.putBoolean("Turned", RobotMap.turned);
 		if(!RobotMap.turned)
 			drive(dir, 0);
 		if(Math.abs(RobotMap.leftMotors[0].getSelectedSensorPosition(0)) >= (Math.abs(encoderValue) + dist)
@@ -298,7 +303,7 @@ public class Robot extends IterativeRobot {
 	}
 	
 	public void raiseArm() {
-		SmartDashboard.putBoolean("ArmUp", RobotMap.armUp);
+		SmartDashboard.putBoolean("Arm Up", RobotMap.armUp);
 		//if(Math.abs(RobotMap.armEncoderVal) <= RobotMap.armEncoderLimit)
 		if(armTimer.get() < RobotMap.armTime)
 		{
@@ -320,7 +325,7 @@ public class Robot extends IterativeRobot {
 	
 	public void bumpSwitch() {
 		SmartDashboard.putNumber("encoder", RobotMap.leftMotors[0].getSelectedSensorPosition(0));
-		SmartDashboard.putBoolean("To Switch", RobotMap.atSwitch);
+		SmartDashboard.putBoolean("At Switch", RobotMap.atSwitch);
 		if(!RobotMap.atSwitch)
 			drive(0, -0.5);
 		if(Math.abs(RobotMap.leftMotors[0].getSelectedSensorPosition(0)) <= (Math.abs(encoderValue) - 10000)
