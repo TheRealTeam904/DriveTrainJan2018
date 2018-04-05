@@ -169,18 +169,18 @@ public class Robot extends IterativeRobot {
 			case "R":
 				gameData = DriverStation.getInstance().getGameSpecificMessage();
 				//toSwitch();
-				baseline(72000);
+				baseline(82000);
                 if(gameData.length() > 0) {
 				  if(gameData.charAt(0) == 'L' && m_autoSelected == "L") {
 					  if(RobotMap.hitBaseline && !RobotMap.armUp)
 						  raiseArm();
 					  if(RobotMap.armUp)
-						  turn(0.5, 6000);
+						  turn(0.5, 12000);
 				  } else if(gameData.charAt(0) == 'R' && m_autoSelected == "R") {
 					  if(RobotMap.nearSwitch && !RobotMap.armUp)
 						  raiseArm();
 					  if(RobotMap.armUp)
-						  turn(-0.5, 6000);
+						  turn(-0.5, 12000);
 				  } else {
 					  break;
 				  }
@@ -230,6 +230,24 @@ public class Robot extends IterativeRobot {
 		else
 		{
 			RobotMap.grabber.set(DoubleSolenoid.Value.kOff);
+		}
+		
+		
+		// Grabber intake wheels
+		if(RobotMap.controller.getRawButton(RobotMap.accessoryStickCubeIntakeButton))
+		{
+			RobotMap.IntakeLeftMotor.set(1);
+			RobotMap.IntakeRightMotor.set(1);
+		}
+		else if(RobotMap.controller.getRawButton(RobotMap.accessoryStickCubeOutputButton))
+		{
+			RobotMap.IntakeLeftMotor.set(-1);
+			RobotMap.IntakeRightMotor.set(-1);
+		}
+		else
+		{
+			RobotMap.IntakeLeftMotor.set(0);
+			RobotMap.IntakeRightMotor.set(0);
 		}
 		
 		
@@ -315,7 +333,7 @@ public class Robot extends IterativeRobot {
 			RobotMap.arms.set(RobotMap.armSpeed);
 		}
 		//if(Math.abs(RobotMap.armEncoderVal) >= RobotMap.armEncoderLimit)
-		if(armTimer.get() >= 2.0)
+		if(armTimer.get() >= 6.0)
 		{
 			RobotMap.arms.set(0);
 			armTimer.stop();
