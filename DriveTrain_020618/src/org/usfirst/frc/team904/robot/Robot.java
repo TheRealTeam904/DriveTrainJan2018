@@ -170,6 +170,7 @@ public class Robot extends IterativeRobot {
 				gameData = DriverStation.getInstance().getGameSpecificMessage();
 				//toSwitch();
 				baseline(82000);
+				SmartDashboard.putString("Game Data", gameData);
                 if(gameData.length() > 0) {
 				  if(gameData.charAt(0) == 'L' && m_autoSelected == "L") {
 					  if(RobotMap.hitBaseline && !RobotMap.armUp)
@@ -177,7 +178,7 @@ public class Robot extends IterativeRobot {
 					  if(RobotMap.armUp)
 						  turn(0.5, 12000);
 				  } else if(gameData.charAt(0) == 'R' && m_autoSelected == "R") {
-					  if(RobotMap.nearSwitch && !RobotMap.armUp)
+					  if(RobotMap.hitBaseline && !RobotMap.armUp)
 						  raiseArm();
 					  if(RobotMap.armUp)
 						  turn(-0.5, 12000);
@@ -303,7 +304,7 @@ public class Robot extends IterativeRobot {
 		if(Math.abs(RobotMap.leftMotors[0].getSelectedSensorPosition(0)) >= dist) {
 			drive(0, 0);
 			RobotMap.hitBaseline = true;
-			encoderValue = RobotMap.leftMotors[0].getSelectedSensorPosition(0);
+			encoderValue = Math.abs(RobotMap.leftMotors[0].getSelectedSensorPosition(0));
 		}
 	}
 	
@@ -312,11 +313,11 @@ public class Robot extends IterativeRobot {
 		SmartDashboard.putBoolean("Turned", RobotMap.turned);
 		if(!RobotMap.turned)
 			drive(dir, 0);
-		if(Math.abs(RobotMap.leftMotors[0].getSelectedSensorPosition(0)) >= (Math.abs(encoderValue) + dist)
-				|| Math.abs(RobotMap.leftMotors[0].getSelectedSensorPosition(0)) <= (Math.abs(encoderValue) - dist)) {
+		if(Math.abs(RobotMap.leftMotors[0].getSelectedSensorPosition(0)) >= (encoderValue + dist)
+				|| Math.abs(RobotMap.leftMotors[0].getSelectedSensorPosition(0)) <= (encoderValue - dist)) {
 			drive(0, 0);
 			RobotMap.turned = true;
-			encoderValue = RobotMap.leftMotors[0].getSelectedSensorPosition(0);
+			encoderValue = Math.abs(RobotMap.leftMotors[0].getSelectedSensorPosition(0));
 		}
 	}
 	
@@ -346,8 +347,8 @@ public class Robot extends IterativeRobot {
 		SmartDashboard.putBoolean("At Switch", RobotMap.atSwitch);
 		if(!RobotMap.atSwitch)
 			drive(0, -0.5);
-		if(Math.abs(RobotMap.leftMotors[0].getSelectedSensorPosition(0)) <= (Math.abs(encoderValue) - 10000)
-				|| Math.abs(RobotMap.leftMotors[0].getSelectedSensorPosition(0)) >= (Math.abs(encoderValue) + 10000)) {
+		if(Math.abs(RobotMap.leftMotors[0].getSelectedSensorPosition(0)) <= (encoderValue - 10000)
+				|| Math.abs(RobotMap.leftMotors[0].getSelectedSensorPosition(0)) >= (encoderValue + 10000)) {
 			drive(0, 0);
 			RobotMap.atSwitch = true;
 		}
