@@ -71,6 +71,13 @@ public class Robot extends IterativeRobot {
 		RobotMap.arms.setNeutralMode(NeutralMode.Brake);
 		RobotMap.arms.set(0);
 		
+		RobotMap.IntakeLeftMotor.setNeutralMode(NeutralMode.Coast);
+		RobotMap.IntakeRightMotor.setNeutralMode(NeutralMode.Coast);
+		RobotMap.IntakeLeftMotor.setInverted(false); //
+		RobotMap.IntakeRightMotor.setInverted(true); // switch these if the intake motors are backwards
+		RobotMap.IntakeLeftMotor.set(0);
+		RobotMap.IntakeRightMotor.set(0);
+		
 		RobotMap.shift.set(RobotMap.shiftLow);
 		RobotMap.grabber.set(RobotMap.grabberClose);
 		
