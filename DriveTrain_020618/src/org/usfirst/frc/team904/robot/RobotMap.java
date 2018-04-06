@@ -55,8 +55,8 @@ public class RobotMap {
 	public static int accessoryStickClimbAxis = 1;
 	public static int accessoryStickGrabberGrabTrigger = 3;
 	public static int accessoryStickGrabberReleaseTrigger = 2;
-	public static int accessoryStickCubeIntakeButton = 6;
-	public static int accessoryStickCubeOutputButton = 5;
+	public static int accessoryStickCubeIntakeButton = 5;
+	public static int accessoryStickCubeOutputButton = 6;
 
 	// encoder values to disable high gear to resist tipping the robot
 	public static final double elevation = 0.0; // climber elevation
