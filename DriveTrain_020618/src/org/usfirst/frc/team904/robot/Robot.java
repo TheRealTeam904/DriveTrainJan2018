@@ -116,49 +116,12 @@ public class Robot extends IterativeRobot {
 	 */
 	@Override
 	public void autonomousPeriodic() {
-		String gameData;
+		//String gameData;
 		switch (m_autoSelected) {
 			case kBaselineAuto:
 				baseline();
 				break;
-			case kVisionAutoFarLeftRed:
-				baseline();
-				turn(RobotMap.right);
-				gameData = DriverStation.getInstance().getGameSpecificMessage();
-                if(gameData.length() > 0) {
-				  if(gameData.charAt(0) == 'L') {
-					//place cube on switch
-				  } else if(gameData.charAt(1) == 'R') {
-					  //place cube on scale
-					  /*turn(RobotMap.left);
-						toScale();
-						turn(RobotMap.right);
-						if(pixVal()) {
-							// place cube on scale
-							RobotMap.shift.set(RobotMap.shiftHigh);
-						}*/
-				  }
-                }
-				break;
-			case kVisionAutoFarLeftBlue:
-				baseline();
-				turn(RobotMap.right);
-				gameData = DriverStation.getInstance().getGameSpecificMessage();
-                if(gameData.length() > 0) {
-				  if(gameData.charAt(0) == 'L') {
-					//place cube on switch
-				  } else if(gameData.charAt(1) == 'R') {
-					  //place cube on scale
-					  /*turn(RobotMap.left);
-						toScale();
-						turn(RobotMap.right);
-						if(pixVal()) {
-							// place cube on scale
-							RobotMap.shift.set(RobotMap.shiftHigh);
-						}*/
-				  }
-                }
-                break;
+			
 			case kDefaultAuto:
 			default:
 				// Do Nothing
@@ -217,20 +180,37 @@ public class Robot extends IterativeRobot {
 			RobotMap.shift.set(DoubleSolenoid.Value.kOff);
 		}
 		
+		// grabber intake
+		if(RobotMap.controller.getRawButton(RobotMap.accessoryStickCubeIntakeButton))
+		{
+			RobotMap.IntakeLeftMotor.set(1);
+			RobotMap.IntakeRightMotor.set(1);
+		}
+		else if(RobotMap.controller.getRawButton(RobotMap.accessoryStickCubeOutputButton))
+		{
+			RobotMap.IntakeLeftMotor.set(-1);
+			RobotMap.IntakeRightMotor.set(-1);
+		}
+		else
+		{
+			RobotMap.IntakeLeftMotor.set(0);
+			RobotMap.IntakeRightMotor.set(0);
+		}
+		
 		// Limit switch override for reset.
-				// Should be hard to trigger, we only want to do this
-				// in the pit.
-				///////////////////////////////////
-				if(RobotMap.driveStick.getRawButton(7)
-						&& RobotMap.driveStick.getRawButton(8)
-						&& RobotMap.driveStick.getRawButton(9)
-						&& RobotMap.driveStick.getRawButton(10))
-				{
-					RobotMap.climber.overrideLimitSwitchesEnable(false);
-				}
-				else
-				{
-					RobotMap.climber.overrideLimitSwitchesEnable(true);
+		// Should be hard to trigger, we only want to do this
+		// in the pit.
+		///////////////////////////////////
+		if(RobotMap.driveStick.getRawButton(7)
+				&& RobotMap.driveStick.getRawButton(8)
+				&& RobotMap.driveStick.getRawButton(9)
+				&& RobotMap.driveStick.getRawButton(10))
+		{
+			RobotMap.climber.overrideLimitSwitchesEnable(false);
+		}
+		else
+		{
+			RobotMap.climber.overrideLimitSwitchesEnable(true);
 		}
 	}
 
@@ -254,48 +234,6 @@ public class Robot extends IterativeRobot {
 		}
 	}
 	
-	public void turn(int dir) {
-		drive(dir, 0);
-		while(Math.abs(RobotMap.leftMotors[0].getSelectedSensorPosition(0))
-				< RobotMap.turnVal);
-		drive(0, 0);
-	}
-	
-	public void toScale() {
-		drive(0, 1);
-		while(Math.abs(RobotMap.leftMotors[0].getSelectedSensorPosition(0))
-				< RobotMap.scaleDist);
-		drive(0, 0);
-	}
-	
-	public boolean pixVal() {
-		double red = 0;
-		double blue = 0;
-		
-		long status = RobotMap.cvSink.grabFrame(RobotMap.source);
-		if(status == 0) {System.out.println(RobotMap.cvSink.getError());}
-		else {System.out.println("OK");}
-		
-		int rows = RobotMap.source.rows();
-		int cols = RobotMap.source.cols();
-		double[] temp = new double[3];
-		
-		for(int i = 0; i < rows; i++) {
-			for(int j = 0; j < cols; j++) {
-				temp = RobotMap.source.get(i, j);
-				blue += temp[0];	// add the pixel values for blue
-				red += temp[2];		// add the pixel values for red
-			}
-		}
-
-		System.out.println("");
-		
-		if(red > blue)
-			return true;
-		else
-			return false;
-	}
-	
 	/**
 	 * Drive methods
 	 */
@@ -311,7 +249,7 @@ public class Robot extends IterativeRobot {
 	}
 	
 	public double[] deadzone(double x, double y) {	
-		return new double[] {(deadzone(x) * 0.5), (deadzone(y) * 0.5)};
+		return new double[] {(deadzone(x) * 0.75), (deadzone(y) * 0.75)};
 	}
 	
 	public void drive(double turn, double forward) {
