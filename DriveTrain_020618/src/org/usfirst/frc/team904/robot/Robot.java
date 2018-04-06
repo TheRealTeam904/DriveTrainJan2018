@@ -21,6 +21,7 @@ import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.GenericHID.Hand;
 import edu.wpi.first.wpilibj.IterativeRobot;
 import edu.wpi.first.wpilibj.Joystick;
+import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 
@@ -34,10 +35,10 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 public class Robot extends IterativeRobot {
 	private static final String kDefaultAuto = "Default";
 	private static final String kBaselineAuto = "Baseline";
-	private static final String kVisionAutoFarLeftRed = "Red";
-	private static final String kVisionAutoFarLeftBlue = "Blue";
 	private String m_autoSelected;
 	private SendableChooser<String> m_chooser = new SendableChooser<>();
+	private Timer armTimer = new Timer();
+	private Timer grabberTimer = new Timer();
 
 
 	/**
@@ -48,8 +49,6 @@ public class Robot extends IterativeRobot {
 	public void robotInit() {
 		m_chooser.addDefault("Do Nothing", kDefaultAuto);
 		m_chooser.addObject("Baseline", kBaselineAuto);
-		//m_chooser.addObject("Turn Right Red", kVisionAutoRightRed);
-		//m_chooser.addObject("Turn Right Blue", kVisionAutoRightBlue);
 		SmartDashboard.putData("Auto choices", m_chooser);
 		
 		for(WPI_TalonSRX motor : RobotMap.leftMotors)
@@ -109,6 +108,7 @@ public class Robot extends IterativeRobot {
 		RobotMap.leftMotors[0].setSelectedSensorPosition(0, 0, 100);
 		
 		RobotMap.hitBaseline = false;
+		RobotMap.armUp = false;
 	}
 
 	/**
@@ -116,12 +116,23 @@ public class Robot extends IterativeRobot {
 	 */
 	@Override
 	public void autonomousPeriodic() {
-		//String gameData;
+		String gameData;
 		switch (m_autoSelected) {
 			case kBaselineAuto:
 				baseline();
 				break;
-			
+			case "L":
+			case "R":
+				gameData = DriverStation.getInstance().getGameSpecificMessage();
+				raiseArm();
+				if(RobotMap.armUp)
+					baseline();
+				if(RobotMap.hitBaseline) {
+					if(gameData.charAt(0) == m_autoSelected.charAt(0)) {
+						dropCube();
+					}
+				}
+				break;
 			case kDefaultAuto:
 			default:
 				// Do Nothing
@@ -231,6 +242,43 @@ public class Robot extends IterativeRobot {
 		if(Math.abs(RobotMap.leftMotors[0].getSelectedSensorPosition(0)) >= RobotMap.baseline) {
 			drive(0, 0);
 			RobotMap.hitBaseline = true;
+		}
+	}
+	
+	public void raiseArm() {
+		SmartDashboard.putBoolean("Arm Up", RobotMap.armUp);
+		//if(Math.abs(RobotMap.armEncoderVal) <= RobotMap.armEncoderLimit)
+		if(armTimer.get() < 6.0)
+		{
+			//RobotMap.armEncoderVal = RobotMap.armEncoder.get();
+			SmartDashboard.putString("Status", "raising arm");
+			//SmartDashboard.putNumber("arm encoder", RobotMap.armEncoderVal);
+			SmartDashboard.putNumber("arm timer", armTimer.get());
+			armTimer.start();
+			RobotMap.arms.set(0.4);
+		}
+		//if(Math.abs(RobotMap.armEncoderVal) >= RobotMap.armEncoderLimit)
+		if(armTimer.get() >= 6.0)
+		{
+			RobotMap.arms.set(0);
+			armTimer.stop();
+			RobotMap.armUp = true;
+		}
+	}
+	
+	void dropCube() {
+		if(grabberTimer.get() == 0)
+		{
+			grabberTimer.start();
+			RobotMap.grabber.set(RobotMap.grabberOpen);
+			SmartDashboard.putNumber("grabber timer", grabberTimer.get());
+		}
+		
+		if(grabberTimer.get() > 0.5 )
+		{
+			grabberTimer.stop();
+			RobotMap.grabber.set(DoubleSolenoid.Value.kOff);
+			SmartDashboard.putBoolean("Drop Cube", true);
 		}
 	}
 	

@@ -67,6 +67,7 @@ public class RobotMap {
 	public static final int right = 1;
 	public static final int baseline = 67000;
 	public static boolean hitBaseline;
+	public static boolean armUp;
 	public static final int turnVal = 1000;
 	public static final int scaleDist = 21200;
 	public static final int blueVal = 0xFF0000;
