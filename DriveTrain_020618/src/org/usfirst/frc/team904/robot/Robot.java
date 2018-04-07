@@ -39,7 +39,7 @@ public class Robot extends IterativeRobot {
 	private SendableChooser<String> m_chooser = new SendableChooser<>();
 	private Timer armTimer = new Timer();
 	private Timer grabberTimer = new Timer();
-
+	private Timer autoTimer = new Timer();
 
 	/**
 	 * This function is run when the robot is first started up and should be
@@ -49,6 +49,8 @@ public class Robot extends IterativeRobot {
 	public void robotInit() {
 		m_chooser.addDefault("Do Nothing", kDefaultAuto);
 		m_chooser.addObject("Baseline", kBaselineAuto);
+		m_chooser.addObject("Left", "L");
+		m_chooser.addObject("Right", "R");
 		SmartDashboard.putData("Auto choices", m_chooser);
 		
 		for(WPI_TalonSRX motor : RobotMap.leftMotors)
@@ -69,6 +71,13 @@ public class Robot extends IterativeRobot {
 
 		RobotMap.arms.setNeutralMode(NeutralMode.Brake);
 		RobotMap.arms.set(0);
+		
+		RobotMap.IntakeLeftMotor.setNeutralMode(NeutralMode.Coast);
+		RobotMap.IntakeRightMotor.setNeutralMode(NeutralMode.Coast);
+		RobotMap.IntakeLeftMotor.setInverted(false); //
+		RobotMap.IntakeRightMotor.setInverted(true); // switch these if the intake motors are backwards
+		RobotMap.IntakeLeftMotor.set(0);
+		RobotMap.IntakeRightMotor.set(0);
 		
 		RobotMap.shift.set(RobotMap.shiftLow);
 		RobotMap.grabber.set(RobotMap.grabberClose);
@@ -109,6 +118,15 @@ public class Robot extends IterativeRobot {
 		
 		RobotMap.hitBaseline = false;
 		RobotMap.armUp = false;
+		
+		armTimer.stop();
+		armTimer.reset();
+		
+		grabberTimer.stop();
+		grabberTimer.reset();
+		
+		autoTimer.stop();
+		autoTimer.reset();
 	}
 
 	/**
@@ -127,7 +145,7 @@ public class Robot extends IterativeRobot {
 				raiseArm();
 				if(RobotMap.armUp)
 					baseline();
-				if(RobotMap.hitBaseline) {
+				if(RobotMap.hitBaseline || autoTimer.get() == 5) {
 					if(gameData.charAt(0) == m_autoSelected.charAt(0)) {
 						dropCube();
 					}
@@ -163,10 +181,12 @@ public class Robot extends IterativeRobot {
 		if(RobotMap.controller.getRawAxis(RobotMap.accessoryStickGrabberGrabTrigger) > 0.5)
 		{
 			RobotMap.grabber.set(RobotMap.grabberClose);
+			SmartDashboard.putBoolean("Grabber Closed:", true);
 		}
 		else if(RobotMap.controller.getRawAxis(RobotMap.accessoryStickGrabberReleaseTrigger) > 0.5)
 		{
 			RobotMap.grabber.set(RobotMap.grabberOpen);
+			SmartDashboard.putBoolean("Grabber Closed:", false);
 		}
 		else
 		{
@@ -236,6 +256,7 @@ public class Robot extends IterativeRobot {
 	 * Autonomous methods
 	 */
 	public void baseline() {
+		autoTimer.start();
 		SmartDashboard.putNumber("encoder", RobotMap.leftMotors[0].getSelectedSensorPosition(0));
 		if(!RobotMap.hitBaseline)
 			drive(0, -0.25);
