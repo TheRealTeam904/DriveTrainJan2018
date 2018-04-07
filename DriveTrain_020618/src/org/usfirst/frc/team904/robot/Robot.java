@@ -159,10 +159,12 @@ public class Robot extends IterativeRobot {
 		if(RobotMap.controller.getRawAxis(RobotMap.accessoryStickGrabberGrabTrigger) > 0.5)
 		{
 			RobotMap.grabber.set(RobotMap.grabberClose);
+			SmartDashboard.putBoolean("Grabber Closed:", true);
 		}
 		else if(RobotMap.controller.getRawAxis(RobotMap.accessoryStickGrabberReleaseTrigger) > 0.5)
 		{
 			RobotMap.grabber.set(RobotMap.grabberOpen);
+			SmartDashboard.putBoolean("Grabber Closed:", false);
 		}
 		else
 		{
